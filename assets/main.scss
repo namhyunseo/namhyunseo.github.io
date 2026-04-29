@@ -1,0 +1,23 @@
+---
+---
+
+$brand-color: #0f766e;
+$link-base-color: #0f766e;
+$link-visited-color: #115e59;
+$code-background-color: #f4f4f5;
+
+@import "minima";
+
+.site-title,
+.post-link {
+  font-weight: 700;
+}
+
+.page-content {
+  line-height: 1.75;
+}
+
+.post-content h2,
+.post-content h3 {
+  margin-top: 2rem;
+}

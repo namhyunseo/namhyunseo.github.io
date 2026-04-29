@@ -1,10 +1,9 @@
 ---
 layout: post
 title: "포스트 제목을 입력하세요"
-date: YYYY-MM-DD HH:MM:SS +0900
 categories: [category1, category2]
 tags: [tag1, tag2]
-# published: false # 정식 게시 전까지는 false로 두면 목록에 나오지 않습니다.
+# published: false
 ---
 
 ## 여기에 소제목을 입력하세요

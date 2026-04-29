@@ -2,6 +2,10 @@ title: Namuteo
 description: 개발과 그 외
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://namhyunseo.github.io"
+lang: ko-KR
+timezone: Asia/Seoul
+permalink: /:categories/:year/:month/:day/:title/
+markdown: kramdown
 
 theme: minima
 plugins:
@@ -13,5 +17,15 @@ author:
   email: namhyunseo0224@gmail.com
 
 minima:
+  header_pages:
+    - index.md
+    - about.md
   social_links:
     - { platform: github, user: namhyunseo }
+
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: post
