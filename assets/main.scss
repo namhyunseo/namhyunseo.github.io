@@ -26,41 +26,10 @@ $code-background-color: #f4f4f5;
   box-shadow: 0 18px 40px -28px rgba(15, 118, 110, 0.45);
 }
 
-.home-intro__eyebrow {
-  margin-bottom: 0.5rem;
-  color: $brand-color;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-}
-
 .home-intro__title {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0;
   font-size: 2rem;
   line-height: 1.2;
-}
-
-.home-intro__body {
-  max-width: 38rem;
-  margin-bottom: 1rem;
-  color: #475569;
-}
-
-.home-intro__topics {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin: 0;
-  list-style: none;
-}
-
-.home-intro__topics li {
-  padding: 0.35rem 0.8rem;
-  border-radius: 999px;
-  background: #e6f4f1;
-  color: #115e59;
-  font-size: 0.95rem;
-  font-weight: 600;
 }
 
 .home .post-list-heading {
