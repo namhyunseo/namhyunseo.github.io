@@ -36,12 +36,12 @@ bundle exec jekyll build
 
 - 게시글은 `_posts/` 아래에 `YYYY-MM-DD-title.md` 형식으로 생성합니다.
 - 초안은 `_drafts/` 아래에서 작성합니다.
-- 템플릿은 `_drafts/new-post-template.md`를 복제해서 사용하면 됩니다.
+- 템플릿은 `_posts/new-post-template.md`를 복제해서 사용하면 됩니다.
 
 예시:
 
 ```bash
-cp _drafts/new-post-template.md _posts/2026-04-29-my-new-post.md
+cp _posts/new-post-template.md _posts/2026-04-29-my-new-post.md
 ```
 
 ## Project Structure

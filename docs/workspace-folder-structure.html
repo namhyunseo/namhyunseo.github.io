@@ -1,0 +1,1002 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Workspace Folder Structure</title>
+    <style>
+      :root {
+        --bg: #f3eee5;
+        --ink: #201c17;
+        --muted: #6b655b;
+        --surface: rgba(255, 251, 245, 0.84);
+        --surface-2: rgba(255, 255, 255, 0.72);
+        --line: rgba(73, 63, 48, 0.16);
+        --navy: #284c72;
+        --navy-soft: #dce8f4;
+        --forest: #1f6b54;
+        --forest-soft: #deeee6;
+        --amber: #9a6712;
+        --amber-soft: #f7e4b5;
+        --coral: #ae543f;
+        --coral-soft: #f1ddd6;
+        --violet: #5b3f8a;
+        --violet-soft: #ece5f8;
+        --shadow: 0 22px 60px rgba(41, 31, 17, 0.12);
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 10% 0%, rgba(220, 232, 244, 0.9), transparent 28%),
+          radial-gradient(circle at 90% 14%, rgba(222, 238, 230, 0.88), transparent 24%),
+          linear-gradient(180deg, #faf4ea 0%, var(--bg) 46%, #ebe1d0 100%);
+        font-family: "Avenir Next", "Pretendard Variable", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      h1, h2, h3, p, ul, pre { margin: 0; }
+      a { color: inherit; }
+
+      code {
+        padding: 1px 6px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.64);
+        font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+        font-size: 0.92em;
+      }
+
+      .wrap {
+        width: min(1160px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 32px 0 84px;
+      }
+
+      /* ── Hero ── */
+      .hero {
+        position: relative;
+        overflow: hidden;
+        padding: 34px 34px 30px;
+        border-radius: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.56);
+        background:
+          linear-gradient(135deg, rgba(32, 55, 79, 0.96), rgba(91, 63, 138, 0.82)),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent);
+        color: #f8f4ee;
+        box-shadow: var(--shadow);
+      }
+      .hero:before, .hero:after {
+        content: "";
+        position: absolute;
+        border-radius: 999px;
+        filter: blur(10px);
+      }
+      .hero:before { width: 220px; height: 220px; right: -38px; top: -56px; background: rgba(255,255,255,0.1); }
+      .hero:after  { width: 280px; height: 280px; left: -70px; bottom: -154px; background: rgba(247,228,181,0.15); }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 5px 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.14);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .hero-grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.95fr);
+        gap: 22px;
+        margin-top: 18px;
+      }
+
+      .hero h1 {
+        max-width: 14ch;
+        font-family: "Iowan Old Style", "Palatino Linotype", serif;
+        font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+        line-height: 0.98;
+        letter-spacing: -0.04em;
+      }
+
+      .hero p {
+        margin-top: 14px;
+        max-width: 60ch;
+        color: rgba(248, 244, 238, 0.84);
+        font-size: 15.5px;
+      }
+
+      .hero-side {
+        display: grid;
+        gap: 12px;
+        align-self: end;
+        padding: 18px;
+        border-radius: 22px;
+        border: 1px solid rgba(255,255,255,0.16);
+        background: rgba(255,255,255,0.08);
+        backdrop-filter: blur(12px);
+      }
+      .hero-side strong { font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(248,244,238,0.72); }
+      .hero-side .big  { font-size: 19px; line-height: 1.35; font-weight: 700; }
+
+      .doc-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+      .doc-link {
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.16);
+        background: rgba(255,255,255,0.08);
+        text-decoration: none;
+        font-size: 13px;
+      }
+
+      /* ── Nav ── */
+      .nav-shell {
+        position: sticky;
+        top: 16px;
+        z-index: 4;
+        margin: 18px 0 28px;
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.54);
+        background: rgba(255,251,245,0.8);
+        backdrop-filter: blur(12px);
+      }
+      .toc { display: flex; flex-wrap: wrap; gap: 10px; }
+      .toc a {
+        padding: 8px 12px;
+        border-radius: 999px;
+        text-decoration: none;
+        font-size: 13px;
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,0.72);
+      }
+
+      /* ── Section ── */
+      .section { margin-top: 18px; }
+      .section-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+      .section-no {
+        display: inline-grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        background: var(--navy-soft);
+        color: var(--navy);
+        font-weight: 800;
+        flex-shrink: 0;
+      }
+      .section-head h2 { font-size: 24px; letter-spacing: -0.02em; }
+      .section-head p, .muted { color: var(--muted); font-size: 14px; }
+
+      .inline-link {
+        color: var(--navy);
+        text-decoration: none;
+        font-weight: 700;
+        border-bottom: 1px solid rgba(40,76,114,0.28);
+      }
+
+      .lead { font-size: 19px; line-height: 1.52; letter-spacing: -0.01em; }
+
+      /* ── Grid ── */
+      .grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+      .card {
+        padding: 22px;
+        border-radius: 24px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        box-shadow: 0 10px 32px rgba(53,40,23,0.06);
+        backdrop-filter: blur(10px);
+      }
+      .span-12 { grid-column: span 12; }
+      .span-8  { grid-column: span 8; }
+      .span-7  { grid-column: span 7; }
+      .span-6  { grid-column: span 6; }
+      .span-5  { grid-column: span 5; }
+      .span-4  { grid-column: span 4; }
+      .span-3  { grid-column: span 3; }
+
+      /* ── Tree ── */
+      .tree {
+        overflow-x: auto;
+        padding: 24px 28px;
+        border-radius: 20px;
+        background: #1e1a14;
+        color: #f0e8d8;
+        font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+        font-size: 13.5px;
+        line-height: 1.85;
+        white-space: pre;
+      }
+      .tree .root  { color: #f0c060; font-weight: 800; }
+      .tree .dir   { color: #7dd3a8; font-weight: 700; }
+      .tree .file  { color: #b8d4f0; }
+      .tree .note  { color: #8a8070; }
+      .tree .badge {
+        display: inline-block;
+        margin-left: 8px;
+        padding: 1px 7px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        vertical-align: middle;
+      }
+      .b-git     { background: rgba(40,76,114,0.35); color: #8fc4f0; }
+      .b-obsidian{ background: rgba(91,63,138,0.35); color: #c4a8f4; }
+      .b-data    { background: rgba(154,103,18,0.35); color: #f0c878; }
+      .b-ignore  { background: rgba(174,84,63,0.3);  color: #f0a090; }
+
+      /* ── Folder cards ── */
+      .folder-card {
+        padding: 20px 22px;
+        border-radius: 20px;
+        border: 1px solid var(--line);
+        background: var(--surface-2);
+        display: grid;
+        gap: 10px;
+      }
+      .folder-card header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .folder-icon {
+        display: inline-grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+      .folder-card h3 {
+        font-size: 17px;
+        letter-spacing: -0.01em;
+      }
+      .folder-card code {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .folder-tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 9px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .tag-git     { background: var(--navy-soft);   color: var(--navy); }
+      .tag-obsidian{ background: var(--violet-soft); color: var(--violet); }
+      .tag-data    { background: var(--amber-soft);  color: var(--amber); }
+      .tag-ignore  { background: var(--coral-soft);  color: var(--coral); }
+
+      .sub-list { padding-left: 0; list-style: none; display: grid; gap: 6px; }
+      .sub-list li {
+        padding: 8px 12px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.6);
+        border: 1px solid var(--line);
+        font-size: 13.5px;
+      }
+      .sub-list li strong { font-size: 13px; }
+      .sub-list li span   { color: var(--muted); font-size: 12.5px; margin-left: 6px; }
+
+      /* ── Table ── */
+      table { width: 100%; border-collapse: collapse; }
+      th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 14px; }
+      th { color: var(--muted); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; background: rgba(255,255,255,0.46); }
+      tr:last-child td { border-bottom: 0; }
+
+      .rule-note {
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: rgba(220,232,244,0.45);
+        border: 1px solid rgba(40,76,114,0.16);
+        font-size: 14px;
+      }
+
+      .footer-link {
+        margin-top: 24px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      @media (max-width: 960px) {
+        .hero-grid { grid-template-columns: 1fr; }
+        .span-8, .span-7, .span-6, .span-5, .span-4, .span-3 { grid-column: span 12; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+
+      <header class="hero">
+        <span class="eyebrow">Folder Structure</span>
+        <div class="hero-grid">
+          <div>
+            <h1>Workspace Root Folder Design</h1>
+            <p>
+              워크스페이스는 루트 폴더 하나로 관리한다.
+              앱 코드, Obsidian vault, 런타임 데이터, 아티팩트, 백업이 각자의 자리를 가지며,
+              <strong style="color:#f8f4ee;">project slug</strong>가 Personal OS의 task/goal 데이터와 Obsidian의 지식 폴더를 연결하는 조인 키 역할을 한다.
+            </p>
+          </div>
+          <aside class="hero-side">
+            <strong>핵심 원칙</strong>
+            <div class="big">코드는 git, 지식은 Obsidian, 데이터는 data/ — 그리고 project slug로 세 시스템이 연결된다.</div>
+          </aside>
+        </div>
+        <div class="doc-links">
+          <a class="doc-link" href="./workspace-infrastructure.html">Infrastructure Blueprint</a>
+          <a class="doc-link" href="./workspace-interaction-pipeline.html">Interaction Pipeline</a>
+          <a class="doc-link" href="./main-workspace-control-plane.html">Main Workspace Blueprint</a>
+        </div>
+      </header>
+
+      <div class="nav-shell">
+        <nav class="toc" aria-label="Document sections">
+          <a href="#s1">전체 구조</a>
+          <a href="#s2">personal-os/</a>
+          <a href="#s3">knowledge/</a>
+          <a href="#s-join">Project 조인 키</a>
+          <a href="#s4">data/</a>
+          <a href="#s5">artifacts/</a>
+          <a href="#s6">backups/</a>
+          <a href="#s7">경계 규칙</a>
+        </nav>
+      </div>
+
+      <!-- ── Section 1: 전체 구조 ── -->
+      <section class="section" id="s1">
+        <div class="section-head">
+          <span class="section-no">1</span>
+          <div>
+            <h2>전체 구조</h2>
+            <p>루트 폴더 한 눈에 보기.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-12">
+            <div class="tree">
+<span class="root">~/workspace/</span>                              <span class="note">← 워크스페이스 루트 (앱 코드 없음)</span>
+│
+├── <span class="dir">raw/</span>                                  <span class="badge b-ignore">.gitignore</span>
+│   ├── shared/                            <span class="note">← 프로젝트 무관 참고 자료 (논문, 아티클 등)</span>
+│   └── personal-os/                       <span class="note">← 프로젝트 힌트 (선택적)</span>
+│
+├── <span class="dir">knowledge/</span>                            <span class="badge b-obsidian">obsidian vault</span>
+│   ├── .obsidian/
+│   ├── 00_inbox/                          <span class="note">← 프로젝트 미정 메모, 링크</span>
+│   ├── <span class="dir">wiki/</span>                              <span class="note">← LLM이 raw/ 읽고 자동 생성·유지 (전역 하나)</span>
+│   │   ├── index.md                       <span class="note">← 전체 wiki 목차</span>
+│   │   ├── log.md                         <span class="note">← ingest 이력</span>
+│   │   └── [topic].md                     <span class="note">← 주제별 페이지 (frontmatter에 project_id 태그)</span>
+│   ├── <span class="dir">projects/</span>                          <span class="note">← 사람이 직접 쓰는 지식 (project slug로 분류)</span>
+│   │   ├── personal-os/                   <span class="note">← slug: "personal-os" ← Personal OS DB와 연결</span>
+│   │   │   ├── adr/
+│   │   │   ├── concepts/
+│   │   │   ├── references/
+│   │   │   └── attachments/
+│   │   ├── some-project/                  <span class="note">← slug: "some-project"</span>
+│   │   │   ├── adr/
+│   │   │   └── references/
+│   │   └── ...
+│   ├── <span class="dir">shared/</span>                            <span class="note">← 프로젝트 독립적 공통 지식</span>
+│   │   ├── concepts/
+│   │   └── references/
+│   └── <span class="dir">playbooks/</span>                         <span class="note">← 반복 운영 절차 (프로젝트 무관)</span>
+│
+├── <span class="dir">data/</span>                                 <span class="badge b-ignore">.gitignore</span>
+│   ├── db/
+│   │   └── app.db                         <span class="note">← PGlite / SQLite (projects, tasks, goals)</span>
+│   ├── sessions/
+│   │   ├── sessions.jsonl                 <span class="note">← 세션 이벤트 로그</span>
+│   │   └── snapshots/                     <span class="note">← Context Snapshot 파일들</span>
+│   └── mem0/                              <span class="note">← mem0 store</span>
+│
+├── <span class="dir">artifacts/</span>                            <span class="badge b-ignore">.gitignore</span>
+│   ├── screenshots/
+│   ├── exports/
+│   └── generated/
+│
+└── <span class="dir">backups/</span>                              <span class="badge b-ignore">.gitignore</span>
+    ├── daily/
+    └── weekly/
+
+
+<span class="root">~/personal-os/</span>                             <span class="note">← 앱 (워크스페이스와 별도 위치)</span> <span class="badge b-git">git</span>
+├── src/
+├── public/
+├── docs/                                  <span class="note">← 시스템 설계 문서 (이 파일)</span>
+├── package.json
+└── .env.local                             <span class="note">← WORKSPACE_ROOT=~/workspace 설정</span>
+            </div>
+          </article>
+          <article class="card span-12">
+            <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap: 12px;">
+              <div style="padding:14px 16px; border-radius:16px; background:var(--navy-soft); border:1px solid rgba(40,76,114,0.16);">
+                <div style="font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--navy);margin-bottom:6px;">GIT 관리 (별도)</div>
+                <div style="font-size:14px;"><code>~/personal-os/</code></div>
+                <div style="font-size:12.5px;color:var(--muted);margin-top:4px;">앱 코드. 워크스페이스와 독립적 위치.</div>
+              </div>
+              <div style="padding:14px 16px; border-radius:16px; background:var(--forest-soft); border:1px solid rgba(31,107,84,0.16);">
+                <div style="font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--forest);margin-bottom:6px;">RAW SOURCES</div>
+                <div style="font-size:14px;"><code>raw/</code></div>
+                <div style="font-size:12.5px;color:var(--muted);margin-top:4px;">PDF, 논문, 참고자료. LLM wiki 입력.</div>
+              </div>
+              <div style="padding:14px 16px; border-radius:16px; background:var(--violet-soft); border:1px solid rgba(91,63,138,0.16);">
+                <div style="font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--violet);margin-bottom:6px;">OBSIDIAN VAULT</div>
+                <div style="font-size:14px;"><code>knowledge/</code></div>
+                <div style="font-size:12.5px;color:var(--muted);margin-top:4px;">사람 노트 + LLM wiki. Obsidian으로 관리.</div>
+              </div>
+              <div style="padding:14px 16px; border-radius:16px; background:var(--amber-soft); border:1px solid rgba(154,103,18,0.16);">
+                <div style="font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--amber);margin-bottom:6px;">RUNTIME DATA</div>
+                <div style="font-size:14px;"><code>data/</code></div>
+                <div style="font-size:12.5px;color:var(--muted);margin-top:4px;">DB, 세션 로그, mem0. git 제외.</div>
+              </div>
+              <div style="padding:14px 16px; border-radius:16px; background:var(--coral-soft); border:1px solid rgba(174,84,63,0.16);">
+                <div style="font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--coral);margin-bottom:6px;">GENERATED</div>
+                <div style="font-size:14px;"><code>artifacts/ · backups/</code></div>
+                <div style="font-size:12.5px;color:var(--muted);margin-top:4px;">생성 파일, 백업. git 제외.</div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ── Section 2: 앱-워크스페이스 연결 ── -->
+      <section class="section" id="s2">
+        <div class="section-head">
+          <span class="section-no">2</span>
+          <div>
+            <h2>앱 ↔ 워크스페이스 연결</h2>
+            <p>personal-os 앱은 워크스페이스 밖 별도 위치에 있고, 환경변수로 워크스페이스 경로를 참조한다.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-7">
+            <div class="folder-card">
+              <header>
+                <div class="folder-icon" style="background:var(--navy-soft);">📦</div>
+                <div>
+                  <h3>personal-os/</h3>
+                  <code>~/personal-os/</code> <span style="font-size:12px;color:var(--muted);">← 워크스페이스와 독립적 위치</span>
+                </div>
+                <span class="folder-tag tag-git" style="margin-left:auto;">git repo</span>
+              </header>
+              <ul class="sub-list">
+                <li><strong>src/</strong><span>Next.js · Tauri 앱 소스코드</span></li>
+                <li><strong>docs/</strong><span>이 설계 문서들 (HTML). 코드와 같은 repo에서 관리.</span></li>
+                <li><strong>public/</strong><span>앱 정적 자산</span></li>
+                <li><strong>.claude/</strong><span>Claude Code 설정, hooks, 프로젝트 메모리</span></li>
+                <li><strong>.env.local</strong><span>워크스페이스 경로 설정. git에 넣지 않는다.</span></li>
+              </ul>
+            </div>
+          </article>
+          <article class="card span-5">
+            <h3>.env.local 설정</h3>
+            <p style="font-size:13px;color:var(--muted);margin:10px 0 8px;">앱이 워크스페이스 위치를 알 수 있도록 경로를 환경변수로 주입한다.</p>
+            <div style="background:#1e1a14;border-radius:14px;padding:14px 16px;font-family:monospace;font-size:12.5px;line-height:1.9;color:#f0e8d8;">
+              <span style="color:#8a8070;"># 워크스페이스 루트</span><br>
+              <span style="color:#7dd3a8;">WORKSPACE_ROOT</span>=~/workspace<br>
+              <br>
+              <span style="color:#8a8070;"># 파생 경로 (앱이 계산)</span><br>
+              <span style="color:#8a8070;"># DB_PATH  = $WORKSPACE_ROOT/data/db/app.db</span><br>
+              <span style="color:#8a8070;"># KNOWLEDGE = $WORKSPACE_ROOT/knowledge</span><br>
+              <span style="color:#8a8070;"># SESSIONS  = $WORKSPACE_ROOT/data/sessions</span>
+            </div>
+            <p style="font-size:12.5px;color:var(--muted);margin-top:10px;">
+              <code>WORKSPACE_ROOT</code> 하나만 설정하면 나머지는 앱이 자동으로 파생한다.
+              다른 머신에서 경로가 달라도 이 값만 바꾸면 된다.
+            </p>
+          </article>
+
+          <article class="card span-12">
+            <h3 style="margin-bottom:14px;">물리적 위치 vs 논리적 연결</h3>
+            <div style="display:grid;grid-template-columns:1fr 56px 1fr;align-items:center;gap:0;">
+              <div style="padding:18px;border-radius:18px;background:var(--navy-soft);border:1px solid rgba(40,76,114,0.2);">
+                <div style="font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--navy);margin-bottom:10px;">앱 코드 (git repo)</div>
+                <div style="font-family:monospace;font-size:12.5px;line-height:1.75;color:#2a3a4a;">
+                  ~/personal-os/<br>
+                  ├── src/<br>
+                  ├── docs/<br>
+                  └── .env.local<br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;WORKSPACE_ROOT=<br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;~/workspace
+                </div>
+              </div>
+              <div style="text-align:center;">
+                <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">env var</div>
+                <div style="font-size:22px;color:var(--muted);">→</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:4px;">참조</div>
+              </div>
+              <div style="padding:18px;border-radius:18px;background:var(--amber-soft);border:1px solid rgba(154,103,18,0.2);">
+                <div style="font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--amber);margin-bottom:10px;">워크스페이스 데이터</div>
+                <div style="font-family:monospace;font-size:12.5px;line-height:1.75;color:#3a2a0a;">
+                  ~/workspace/<br>
+                  ├── knowledge/<br>
+                  ├── data/<br>
+                  │&nbsp;&nbsp; └── db/app.db<br>
+                  ├── artifacts/<br>
+                  └── backups/
+                </div>
+              </div>
+            </div>
+            <div class="rule-note" style="margin-top:14px;">
+              앱 코드와 워크스페이스 데이터를 분리하면, 앱을 재설치하거나 코드를 갈아엎어도 <code>~/workspace/</code>의 지식과 DB는 안전하게 남는다.
+              반대로 워크스페이스 경로가 바뀌어도 <code>.env.local</code>만 수정하면 된다.
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ── Section 3: knowledge/ ── -->
+      <section class="section" id="s3">
+        <div class="section-head">
+          <span class="section-no">3</span>
+          <div>
+            <h2>knowledge/</h2>
+            <p>Obsidian vault. 각 파일의 YAML frontmatter가 소스 오브 트루스이며, DB 인덱스는 여기서 파생된다.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-7">
+            <div class="folder-card">
+              <header>
+                <div class="folder-icon" style="background:var(--violet-soft);">🔮</div>
+                <div>
+                  <h3>knowledge/</h3>
+                  <code>$WORKSPACE_ROOT/knowledge/</code>
+                </div>
+                <span class="folder-tag tag-obsidian" style="margin-left:auto;">Obsidian vault</span>
+              </header>
+              <ul class="sub-list">
+                <li>
+                  <strong>wiki/</strong>
+                  <span>LLM이 raw/ 자료를 읽고 자동 생성·유지하는 합성 페이지들. 전역 하나. 각 페이지 frontmatter에 project_id 태그로 필터링.</span>
+                </li>
+                <li>
+                  <strong>00_inbox/</strong>
+                  <span>프로젝트 미정 메모, 링크. 나중에 projects/ 하위로 승격.</span>
+                </li>
+                <li>
+                  <strong>projects/{slug}/</strong>
+                  <span>사람이 직접 쓰는 지식. Personal OS의 project slug와 폴더명 일치. 하위에 adr/, concepts/, references/, attachments/ 구성.</span>
+                </li>
+                <li>
+                  <strong>shared/</strong>
+                  <span>프로젝트 독립적 공통 지식. 범용 개념, 공통 레퍼런스.</span>
+                </li>
+                <li>
+                  <strong>playbooks/</strong>
+                  <span>반복 운영 절차. 배포, 백업 복구, 장비 세팅 등.</span>
+                </li>
+              </ul>
+            </div>
+          </article>
+          <article class="card span-5">
+            <h3>두 계층의 역할 구분</h3>
+            <div style="display:grid;gap:8px;margin-bottom:14px;">
+              <div style="padding:10px 12px;border-radius:12px;background:var(--violet-soft);border:1px solid rgba(91,63,138,0.16);font-size:13px;">
+                <strong style="color:var(--violet);">wiki/</strong> — LLM 작성<br>
+                <span style="color:var(--muted);">raw/ 자료에서 합성. 프로젝트 태그로 필터링.</span>
+              </div>
+              <div style="padding:10px 12px;border-radius:12px;background:var(--navy-soft);border:1px solid rgba(40,76,114,0.16);font-size:13px;">
+                <strong style="color:var(--navy);">projects/{slug}/</strong> — 사람 작성<br>
+                <span style="color:var(--muted);">내 결정, ADR, 직접 정리한 개념.</span>
+              </div>
+            </div>
+            <h3>모든 문서는 frontmatter를 가진다</h3>
+            <p style="font-size:13px;color:var(--muted);margin:10px 0 8px;">메타데이터가 파일 안에 있기 때문에 파일 하나가 완결된다. DB가 날아가도 파일에서 복구 가능.</p>
+            <div style="background:#1e1a14;border-radius:14px;padding:14px 16px;font-family:monospace;font-size:12.5px;line-height:1.8;color:#f0e8d8;">
+              <span style="color:#8a8070;">---</span><br>
+              <span style="color:#7dd3a8;">id</span><span style="color:#f0e8d8;">: adr-001</span><br>
+              <span style="color:#7dd3a8;">project_id</span><span style="color:#f0e8d8;">: personal-os</span><br>
+              <span style="color:#7dd3a8;">type</span><span style="color:#f0e8d8;">: adr</span><br>
+              <span style="color:#7dd3a8;">tags</span><span style="color:#f0e8d8;">: [architecture, db]</span><br>
+              <span style="color:#7dd3a8;">created_at</span><span style="color:#f0e8d8;">: 2026-06-02</span><br>
+              <span style="color:#7dd3a8;">summary</span><span style="color:#f0e8d8;">: "PGlite 로컬 스토리지 채택"</span><br>
+              <span style="color:#8a8070;">---</span><br>
+              <br>
+              <span style="color:#b8d4f0;"># ADR-001: PGlite 채택</span><br>
+              <span style="color:#8a8070;">...본문...</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ── Section: Project 조인 키 ── -->
+      <section class="section" id="s-join">
+        <div class="section-head">
+          <span class="section-no" style="background:var(--violet-soft);color:var(--violet);">∩</span>
+          <div>
+            <h2>Project Slug — 세 시스템의 조인 키</h2>
+            <p>Markdown frontmatter가 소스 오브 트루스. DB 인덱스는 파생물로 언제든 재빌드 가능.</p>
+          </div>
+        </div>
+        <div class="grid">
+
+          <article class="card span-12">
+            <h3 style="margin-bottom:16px;">데이터 흐름</h3>
+            <div style="display:grid;grid-template-columns:1fr 48px 1fr 48px 1fr;align-items:center;gap:0;margin-bottom:20px;">
+
+              <div style="padding:18px;border-radius:18px;background:var(--violet-soft);border:1px solid rgba(91,63,138,0.2);">
+                <div style="font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--violet);margin-bottom:10px;">SOURCE OF TRUTH</div>
+                <div style="font-size:14px;font-weight:700;margin-bottom:8px;">Markdown + Frontmatter</div>
+                <div style="font-family:monospace;font-size:11.5px;line-height:1.75;color:#3a2a5a;background:rgba(255,255,255,0.5);padding:10px;border-radius:10px;">
+                  project_id: personal-os<br>
+                  type: adr<br>
+                  tags: [db]<br>
+                  summary: "..."<br>
+                  ---<br>
+                  # 본문...
+                </div>
+                <div style="font-size:12px;color:var(--muted);margin-top:8px;">사람이 Obsidian에서 직접 작성</div>
+              </div>
+
+              <div style="text-align:center;">
+                <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">파일 변경</div>
+                <div style="font-size:22px;color:var(--muted);">→</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:4px;">감지</div>
+              </div>
+
+              <div style="padding:18px;border-radius:18px;background:var(--forest-soft);border:1px solid rgba(31,107,84,0.2);">
+                <div style="font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--forest);margin-bottom:10px;">INDEX BUILDER</div>
+                <div style="font-size:14px;font-weight:700;margin-bottom:8px;">File Watcher / rebuild</div>
+                <div style="font-family:monospace;font-size:11.5px;line-height:1.75;color:#1a3a2a;background:rgba(255,255,255,0.5);padding:10px;border-radius:10px;">
+                  파일 스캔<br>
+                  frontmatter 파싱<br>
+                  → DB upsert<br>
+                  <br>
+                  rebuild-index 명령으로<br>
+                  언제든 재빌드 가능
+                </div>
+                <div style="font-size:12px;color:var(--muted);margin-top:8px;">DB가 날아가도 파일에서 복구</div>
+              </div>
+
+              <div style="text-align:center;">
+                <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">SQL</div>
+                <div style="font-size:22px;color:var(--muted);">→</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:4px;">쿼리</div>
+              </div>
+
+              <div style="padding:18px;border-radius:18px;background:var(--navy-soft);border:1px solid rgba(40,76,114,0.2);">
+                <div style="font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--navy);margin-bottom:10px;">DERIVED INDEX (PGlite)</div>
+                <div style="font-size:14px;font-weight:700;margin-bottom:8px;">knowledge_index 테이블</div>
+                <div style="font-family:monospace;font-size:11.5px;line-height:1.75;color:#2a3a4a;background:rgba(255,255,255,0.5);padding:10px;border-radius:10px;">
+                  id, project_id<br>
+                  type, tags<br>
+                  summary<br>
+                  file_path<br>
+                  indexed_at
+                </div>
+                <div style="font-size:12px;color:var(--muted);margin-top:8px;">에이전트가 SQL로 빠르게 조회</div>
+              </div>
+
+            </div>
+          </article>
+
+          <article class="card span-6">
+            <h3>DB 스키마 (파생 인덱스)</h3>
+            <div style="background:#1e1a14;border-radius:14px;padding:16px 18px;font-family:monospace;font-size:12.5px;line-height:1.85;color:#f0e8d8;margin-top:12px;white-space:pre;">
+<span style="color:#7dd3a8;">CREATE TABLE</span> knowledge_index (
+  id          TEXT PRIMARY KEY,
+  project_id  TEXT,            <span style="color:#8a8070;">-- slug와 일치</span>
+  type        TEXT,            <span style="color:#8a8070;">-- adr|concept|ref|playbook</span>
+  tags        TEXT,            <span style="color:#8a8070;">-- JSON array</span>
+  summary     TEXT,            <span style="color:#8a8070;">-- frontmatter의 summary</span>
+  file_path   TEXT,            <span style="color:#8a8070;">-- 실제 .md 파일 경로</span>
+  indexed_at  TIMESTAMP
+);</div>
+            <p style="font-size:13px;color:var(--muted);margin-top:12px;">
+              이 테이블은 <strong>절대 직접 수정하지 않는다.</strong>
+              항상 markdown 파일을 수정하고 인덱스가 따라온다.
+            </p>
+          </article>
+
+          <article class="card span-6">
+            <h3>에이전트 세션 시작 흐름</h3>
+            <div style="background:#1e1a14;border-radius:14px;padding:16px 18px;font-family:monospace;font-size:12.5px;line-height:1.85;color:#f0e8d8;margin-top:12px;white-space:pre;">
+<span style="color:#8a8070;">-- 1. Personal OS에서 task/goal 로드</span>
+<span style="color:#7dd3a8;">SELECT</span> * <span style="color:#7dd3a8;">FROM</span> tasks
+<span style="color:#7dd3a8;">WHERE</span> project_id = <span style="color:#f0c060;">'personal-os'</span>
+  <span style="color:#7dd3a8;">AND</span> status = <span style="color:#f0c060;">'active'</span>;
+
+<span style="color:#8a8070;">-- 2. 같은 slug로 지식 인덱스 조회</span>
+<span style="color:#7dd3a8;">SELECT</span> summary, file_path
+<span style="color:#7dd3a8;">FROM</span> knowledge_index
+<span style="color:#7dd3a8;">WHERE</span> project_id = <span style="color:#f0c060;">'personal-os'</span>
+<span style="color:#7dd3a8;">ORDER BY</span> type, indexed_at <span style="color:#7dd3a8;">DESC</span>;
+
+<span style="color:#8a8070;">-- 3. file_path로 실제 내용 로드</span></div>
+          </article>
+
+          <article class="card span-12">
+            <table>
+              <thead>
+                <tr>
+                  <th>에이전트 동작</th>
+                  <th>Personal OS DB</th>
+                  <th>Knowledge (Markdown + Index)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>세션 시작</td>
+                  <td>active tasks, goals 쿼리</td>
+                  <td>knowledge_index에서 slug로 관련 문서 조회 → file_path로 내용 로드</td>
+                </tr>
+                <tr>
+                  <td>설계 결정 내림</td>
+                  <td>decision log에 기록</td>
+                  <td>frontmatter 포함한 .md 파일 생성 → 인덱스 자동 갱신</td>
+                </tr>
+                <tr>
+                  <td>세션 종료</td>
+                  <td>task 상태 업데이트, next_start 갱신</td>
+                  <td>새 지식은 .md 파일로 저장 (인덱스가 따라옴)</td>
+                </tr>
+                <tr>
+                  <td>인덱스 손상 / 분실</td>
+                  <td>영향 없음</td>
+                  <td><code>rebuild-index</code> 실행 → frontmatter 스캔으로 재빌드</td>
+                </tr>
+                <tr>
+                  <td>새 프로젝트 추가</td>
+                  <td>project row 생성 (slug 지정)</td>
+                  <td><code>knowledge/projects/{slug}/</code> 폴더 생성</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="rule-note" style="margin-top:14px;">
+              <strong>핵심 규칙:</strong> knowledge_index는 파생 테이블이다. markdown 파일이 source of truth이고 DB는 검색을 빠르게 하기 위한 캐시다.
+              slug는 영문 소문자 + 하이픈만 사용한다 — Personal OS project slug, Obsidian 폴더명, knowledge_index.project_id가 모두 같은 값을 가져야 한다.
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ── Section 4: data/ ── -->
+      <section class="section" id="s4">
+        <div class="section-head">
+          <span class="section-no">4</span>
+          <div>
+            <h2>data/</h2>
+            <p>런타임 데이터. git에 넣지 않는다. 이 폴더가 날아가도 코드와 지식은 살아있다.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-12">
+            <div class="folder-card">
+              <header>
+                <div class="folder-icon" style="background:var(--amber-soft);">🗄️</div>
+                <div>
+                  <h3>data/</h3>
+                  <code>$WORKSPACE_ROOT/data/</code>
+                </div>
+                <span class="folder-tag tag-ignore" style="margin-left:auto;">git 제외</span>
+              </header>
+              <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:4px;">
+                <div style="padding:14px; border-radius:14px; background:rgba(255,255,255,0.7); border:1px solid var(--line);">
+                  <strong style="font-size:14px;">db/</strong>
+                  <p style="font-size:13px; color:var(--muted); margin-top:6px;">
+                    <code>app.db</code> — PGlite / SQLite.<br>
+                    tasks, goals, projects, session index, action queue.<br>
+                    <code>knowledge_index</code> — Markdown frontmatter에서 파생된 검색 인덱스. 재빌드 가능.<br>
+                    주기적으로 <code>backups/</code>에 스냅샷.
+                  </p>
+                </div>
+                <div style="padding:14px; border-radius:14px; background:rgba(255,255,255,0.7); border:1px solid var(--line);">
+                  <strong style="font-size:14px;">sessions/</strong>
+                  <p style="font-size:13px; color:var(--muted); margin-top:6px;">
+                    <code>sessions.jsonl</code> — 세션 이벤트 로그.<br>
+                    <code>snapshots/</code> — Context Snapshot 파일.<br>
+                    다음 세션 시작 시 재로드.
+                  </p>
+                </div>
+                <div style="padding:14px; border-radius:14px; background:rgba(255,255,255,0.7); border:1px solid var(--line);">
+                  <strong style="font-size:14px;">mem0/</strong>
+                  <p style="font-size:13px; color:var(--muted); margin-top:6px;">
+                    mem0 store.<br>
+                    개인 작업 패턴, 선호, 반복 습관.<br>
+                    Raspberry Pi에서 호스팅 가능.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ── Section 5: artifacts/ ── -->
+      <section class="section" id="s5">
+        <div class="section-head">
+          <span class="section-no">5</span>
+          <div>
+            <h2>artifacts/</h2>
+            <p>실행 중 생성된 파일들. 자동 생성물이라 git에 넣지 않는다.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-6">
+            <div class="folder-card">
+              <header>
+                <div class="folder-icon" style="background:var(--coral-soft);">📎</div>
+                <div>
+                  <h3>artifacts/</h3>
+                  <code>$WORKSPACE_ROOT/artifacts/</code>
+                </div>
+                <span class="folder-tag tag-ignore" style="margin-left:auto;">git 제외</span>
+              </header>
+              <ul class="sub-list">
+                <li><strong>screenshots/</strong><span>에이전트가 찍은 화면 캡처</span></li>
+                <li><strong>exports/</strong><span>앱에서 내보낸 리포트, 데이터 파일</span></li>
+                <li><strong>generated/</strong><span>AI가 생성한 코드, 문서, 기타 결과물</span></li>
+              </ul>
+            </div>
+          </article>
+          <article class="card span-6">
+            <h3>artifacts vs knowledge</h3>
+            <table style="margin-top:10px;">
+              <thead>
+                <tr>
+                  <th>artifacts/</th>
+                  <th>knowledge/</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>자동 생성, 임시적</td>
+                  <td>직접 작성, 장기 보관</td>
+                </tr>
+                <tr>
+                  <td>날짜별 정리</td>
+                  <td>주제별 정리</td>
+                </tr>
+                <tr>
+                  <td>Obsidian 밖에 저장</td>
+                  <td>Obsidian vault 안에 저장</td>
+                </tr>
+                <tr>
+                  <td>검색 안 해도 됨</td>
+                  <td>나중에 다시 찾아야 함</td>
+                </tr>
+              </tbody>
+            </table>
+          </article>
+        </div>
+      </section>
+
+      <!-- ── Section 6: backups/ ── -->
+      <section class="section" id="s6">
+        <div class="section-head">
+          <span class="section-no">6</span>
+          <div>
+            <h2>backups/</h2>
+            <p>data/와 artifacts/의 복사본. 복구 우선순위는 db → sessions → artifacts 순.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-8">
+            <div class="folder-card">
+              <header>
+                <div class="folder-icon" style="background:var(--forest-soft);">💾</div>
+                <div>
+                  <h3>backups/</h3>
+                  <code>$WORKSPACE_ROOT/backups/</code>
+                </div>
+                <span class="folder-tag tag-ignore" style="margin-left:auto;">git 제외</span>
+              </header>
+              <ul class="sub-list">
+                <li><strong>daily/</strong><span>매일 자정 db 스냅샷 + sessions 압축. Raspberry Pi Job Runner가 담당.</span></li>
+                <li><strong>weekly/</strong><span>주 1회 전체 data/ 압축 백업. 장기 보관.</span></li>
+              </ul>
+            </div>
+          </article>
+          <article class="card span-4">
+            <h3>knowledge/ 백업은?</h3>
+            <p style="font-size:14px; margin-top:10px; color:var(--muted);">
+              Obsidian vault는 Git으로 따로 버전 관리하거나 iCloud/Dropbox 동기화를 쓴다.
+              DB처럼 실행 중 손상될 위험이 없어서 별도 스냅샷 백업은 필요 없다.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ── Section 7: 경계 규칙 ── -->
+      <section class="section" id="s7">
+        <div class="section-head">
+          <span class="section-no">7</span>
+          <div>
+            <h2>경계 규칙</h2>
+            <p>어떤 파일이 어느 폴더로 가야 하는지 헷갈릴 때 쓰는 판단 기준.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-12">
+            <table>
+              <thead>
+                <tr>
+                  <th>상황</th>
+                  <th>어디로 가나</th>
+                  <th>이유</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>논문·아티클을 에이전트가 읽고 정리해줬으면 한다</td>
+                  <td><code>raw/</code> (또는 <code>raw/{slug}/</code>)</td>
+                  <td>LLM wiki ingest 입력. 에이전트가 읽고 <code>knowledge/wiki/</code>에 합성 페이지 생성.</td>
+                </tr>
+                <tr>
+                  <td>PDF 저장하고 싶다 (내가 직접 참고할 것)</td>
+                  <td><code>knowledge/projects/{slug}/attachments/</code></td>
+                  <td>Obsidian에서 바로 열고 같은 프로젝트 노트와 연결 가능.</td>
+                </tr>
+                <tr>
+                  <td>작업 중 떠오른 메모 (프로젝트 명확)</td>
+                  <td><code>knowledge/projects/{slug}/</code></td>
+                  <td>해당 프로젝트 폴더에 바로 작성.</td>
+                </tr>
+                <tr>
+                  <td>작업 중 떠오른 메모 (프로젝트 불명확)</td>
+                  <td><code>knowledge/00_inbox/</code></td>
+                  <td>일단 inbox에 넣고, 나중에 projects/ 하위로 승격.</td>
+                </tr>
+                <tr>
+                  <td>설계 결정을 문서로 남기고 싶다</td>
+                  <td><code>knowledge/projects/{slug}/adr/</code></td>
+                  <td>프로젝트 slug에 맞는 ADR 폴더에 저장. personal-os 시스템 자체 문서는 <code>personal-os/docs/</code>에도 유지.</td>
+                </tr>
+                <tr>
+                  <td>에이전트가 생성한 파일</td>
+                  <td><code>artifacts/generated/</code></td>
+                  <td>자동 생성물. 검토 후 knowledge로 승격할 수도 있음.</td>
+                </tr>
+                <tr>
+                  <td>앱 설정, 환경변수</td>
+                  <td><code>~/personal-os/.env.local</code> (.gitignore)</td>
+                  <td>코드의 일부. 단, 시크릿은 git에 절대 넣지 않는다. <code>WORKSPACE_ROOT</code> 경로 포함.</td>
+                </tr>
+                <tr>
+                  <td>DB 파일</td>
+                  <td><code>$WORKSPACE_ROOT/data/db/</code></td>
+                  <td>런타임 데이터. 앱 코드와 분리. git에 넣으면 바이너리 충돌 발생.</td>
+                </tr>
+              </tbody>
+            </table>
+          </article>
+          <article class="card span-12">
+            <div class="rule-note">
+              가장 자주 헷갈리는 경계는 <strong>artifacts/ vs knowledge/</strong>다.
+              "나중에 다시 찾아보고 싶은가?" → Yes면 <code>knowledge/</code>, No면 <code>artifacts/</code>.
+              "직접 쓴 것인가, 자동 생성된 것인가?" → 직접 쓴 것은 <code>knowledge/</code>.
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <div class="footer-link">
+        <a class="inline-link" href="./workspace-infrastructure.html">Infrastructure Blueprint</a>
+        ·
+        <a class="inline-link" href="./workspace-interaction-pipeline.html">Interaction Pipeline</a>
+        ·
+        <a class="inline-link" href="./main-workspace-control-plane.html">Main Workspace Blueprint</a>
+      </div>
+
+    </div>
+  </body>
+</html>

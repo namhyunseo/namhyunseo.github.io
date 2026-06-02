@@ -1,0 +1,834 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Workspace Interaction Pipeline</title>
+    <style>
+      :root {
+        --bg: #f5efe4;
+        --ink: #211d18;
+        --muted: #6e675d;
+        --surface: rgba(255, 251, 245, 0.84);
+        --surface-2: rgba(255, 255, 255, 0.72);
+        --line: rgba(70, 58, 43, 0.16);
+        --forest: #1f6b54;
+        --forest-soft: #deefe8;
+        --blue: #315f88;
+        --blue-soft: #dfeaf5;
+        --amber: #9d6912;
+        --amber-soft: #f8e5b7;
+        --coral: #b5523d;
+        --coral-soft: #f4ddd6;
+        --shadow: 0 22px 60px rgba(37, 30, 18, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 10% 0%, rgba(223, 234, 245, 0.95), transparent 28%),
+          radial-gradient(circle at 92% 12%, rgba(222, 239, 232, 0.9), transparent 24%),
+          linear-gradient(180deg, #faf4ea 0%, var(--bg) 48%, #ede3d2 100%);
+        font-family:
+          "Avenir Next", "Pretendard Variable", "Noto Sans KR", "Apple SD Gothic Neo",
+          sans-serif;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      h1,
+      h2,
+      h3,
+      p,
+      ul,
+      pre {
+        margin: 0;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      code {
+        padding: 1px 6px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.62);
+        font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+        font-size: 0.92em;
+      }
+
+      .wrap {
+        width: min(1160px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 32px 0 84px;
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        padding: 34px 34px 30px;
+        border-radius: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.56);
+        background:
+          linear-gradient(135deg, rgba(29, 58, 71, 0.96), rgba(30, 89, 72, 0.9)),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent);
+        color: #f8f4ee;
+        box-shadow: var(--shadow);
+      }
+
+      .hero:before,
+      .hero:after {
+        content: "";
+        position: absolute;
+        border-radius: 999px;
+        filter: blur(10px);
+      }
+
+      .hero:before {
+        width: 220px;
+        height: 220px;
+        right: -40px;
+        top: -60px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .hero:after {
+        width: 280px;
+        height: 280px;
+        left: -70px;
+        bottom: -150px;
+        background: rgba(248, 229, 183, 0.16);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 5px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.14);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .hero-grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.95fr);
+        gap: 22px;
+        margin-top: 18px;
+      }
+
+      .hero h1 {
+        max-width: 11ch;
+        font-family: "Iowan Old Style", "Palatino Linotype", serif;
+        font-size: clamp(2.4rem, 5vw, 4.4rem);
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+      }
+
+      .hero p {
+        margin-top: 14px;
+        max-width: 60ch;
+        color: rgba(248, 244, 238, 0.84);
+        font-size: 15.5px;
+      }
+
+      .hero-side {
+        display: grid;
+        gap: 12px;
+        align-self: end;
+        padding: 18px;
+        border-radius: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px);
+      }
+
+      .hero-side strong {
+        font-size: 13px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: rgba(248, 244, 238, 0.72);
+      }
+
+      .hero-side .big {
+        font-size: 20px;
+        line-height: 1.35;
+        font-weight: 700;
+      }
+
+      .doc-links,
+      .toc {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .doc-links {
+        margin-top: 18px;
+      }
+
+      .doc-link,
+      .toc a {
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.08);
+        text-decoration: none;
+        font-size: 13px;
+      }
+
+      .nav-shell {
+        position: sticky;
+        top: 16px;
+        z-index: 4;
+        margin: 18px 0 28px;
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.54);
+        background: rgba(255, 251, 245, 0.8);
+        backdrop-filter: blur(12px);
+      }
+
+      .toc a {
+        border-color: var(--line);
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .card {
+        padding: 22px;
+        border-radius: 24px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        box-shadow: 0 10px 32px rgba(53, 40, 23, 0.06);
+        backdrop-filter: blur(10px);
+      }
+
+      .span-12 {
+        grid-column: span 12;
+      }
+
+      .span-8 {
+        grid-column: span 8;
+      }
+
+      .span-7 {
+        grid-column: span 7;
+      }
+
+      .span-6 {
+        grid-column: span 6;
+      }
+
+      .span-5 {
+        grid-column: span 5;
+      }
+
+      .span-4 {
+        grid-column: span 4;
+      }
+
+      .section {
+        margin-top: 18px;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .section-no {
+        display: inline-grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        background: var(--blue-soft);
+        color: var(--blue);
+        font-weight: 800;
+      }
+
+      .section-head h2 {
+        font-size: 24px;
+        letter-spacing: -0.02em;
+      }
+
+      .section-head p,
+      .muted {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .lead {
+        font-size: 19px;
+        line-height: 1.52;
+        letter-spacing: -0.01em;
+      }
+
+      .inline-link {
+        color: var(--blue);
+        text-decoration: none;
+        font-weight: 700;
+        border-bottom: 1px solid rgba(49, 95, 136, 0.28);
+      }
+
+      .loop {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .loop-step {
+        display: grid;
+        gap: 8px;
+        padding: 18px 16px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: var(--surface-2);
+      }
+
+      .loop-step b {
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .loop-step strong {
+        font-size: 17px;
+      }
+
+      .flow-note {
+        margin-top: 14px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: var(--forest-soft);
+        color: var(--forest);
+        border: 1px solid rgba(31, 107, 84, 0.16);
+      }
+
+      .ownership {
+        display: grid;
+        gap: 10px;
+      }
+
+      .owner-row {
+        display: grid;
+        grid-template-columns: minmax(160px, 190px) minmax(0, 1fr);
+        gap: 14px;
+        align-items: start;
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.68);
+        border: 1px solid var(--line);
+      }
+
+      .owner-row strong {
+        font-size: 15px;
+      }
+
+      .event-list,
+      .daily-list {
+        padding-left: 18px;
+      }
+
+      .event-list li,
+      .daily-list li {
+        margin: 8px 0;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+        font-size: 14px;
+      }
+
+      th {
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        background: rgba(255, 255, 255, 0.46);
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .callout {
+        padding: 16px 18px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.68);
+      }
+
+      .footer-link {
+        margin-top: 24px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      @media (max-width: 960px) {
+        .hero-grid,
+        .loop,
+        .owner-row {
+          grid-template-columns: 1fr;
+        }
+
+        .span-8,
+        .span-7,
+        .span-6,
+        .span-5,
+        .span-4 {
+          grid-column: span 12;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="hero">
+        <span class="eyebrow">Interaction Pipeline</span>
+        <div class="hero-grid">
+          <div>
+            <h1>How the Three Systems Work Together</h1>
+            <p>
+              이 문서는 <a class="inline-link" href="./main-workspace-control-plane.html#s2">Personal OS</a>,
+              <a class="inline-link" href="./main-workspace-control-plane.html#knowledge-system">Knowledge System</a>,
+              <a class="inline-link" href="./main-workspace-control-plane.html#main-workspace">Main Workspace</a>가
+              서로 어떤 순서로 상호작용해야 하는지를 파이프라인으로 정리한다.
+              핵심은 세 시스템을 섞는 것이 아니라, 각자의 역할을 보존한 채 이벤트로 연결하는 것이다.
+            </p>
+          </div>
+          <aside class="hero-side">
+            <strong>Core idea</strong>
+            <div class="big">판단은 Personal OS에서, 실행은 Workspace에서, 학습은 Knowledge System에서 일어나야 한다.</div>
+            <div class="muted">mem0는 그 사이에서 사용자 고유의 선호와 반복 패턴을 기억하는 보조 메모리 계층이다.</div>
+          </aside>
+        </div>
+        <div class="doc-links">
+          <a class="doc-link" href="./main-workspace-control-plane.html">Back to Main Workspace Blueprint</a>
+          <a class="doc-link" href="#s2">Jump to Main Loop</a>
+          <a class="doc-link" href="./workspace-infrastructure.html">Open Infrastructure Blueprint</a>
+        </div>
+      </header>
+
+      <div class="nav-shell">
+        <nav class="toc" aria-label="Document sections">
+          <a href="#s1">역할 모델</a>
+          <a href="#s2">메인 루프</a>
+          <a href="#s3">실행 파이프라인</a>
+          <a href="#s4">세션 복구</a>
+          <a href="#s5">정제와 승격</a>
+          <a href="#s6">공유 엔티티</a>
+          <a href="#s7">이벤트 예시</a>
+          <a href="#s8">일상 시나리오</a>
+        </nav>
+      </div>
+
+      <section class="section" id="s1">
+        <div class="section-head">
+          <span class="section-no">1</span>
+          <div>
+            <h2>역할 모델</h2>
+            <p>세 시스템이 동일한 데이터를 동시에 소유하면 결국 충돌한다.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-12">
+            <p class="lead">
+              이 구조에서 <a class="inline-link" href="./main-workspace-control-plane.html#personal-os">Personal OS</a>는
+              `무엇을 할지`를 정하고, <a class="inline-link" href="./main-workspace-control-plane.html#main-workspace">Main Workspace</a>는
+              `어떻게 시작할지`를 준비하며, <a class="inline-link" href="./main-workspace-control-plane.html#knowledge-system">Knowledge System</a>은
+              `무엇을 남길지`를 축적한다. <a class="inline-link" href="./main-workspace-control-plane.html#mem0">mem0</a>는
+              작업 성향과 선호를 기억해 다음 실행의 질을 높인다.
+            </p>
+          </article>
+          <article class="card span-6">
+            <h3>Source of truth</h3>
+            <div class="ownership">
+              <div class="owner-row">
+                <strong>Personal OS</strong>
+                <span>goal, priority, project status, review decision</span>
+              </div>
+              <div class="owner-row">
+                <strong>Main Workspace</strong>
+                <span>session, next start, decision log, handoff, context snapshot</span>
+              </div>
+              <div class="owner-row">
+                <strong>Knowledge System</strong>
+                <span>
+                  <strong>projects/{slug}/</strong> — 사람이 직접 쓴 ADR, 개념, 레퍼런스 (source of truth)<br>
+                  <strong>wiki/</strong> — 에이전트가 raw/ 자료에서 합성한 페이지 (전역, project_id 태그 필터링)<br>
+                  UI는 Obsidian vault
+                </span>
+              </div>
+              <div class="owner-row">
+                <strong>mem0</strong>
+                <span>preference, habit, recurring work pattern, collaboration style</span>
+              </div>
+            </div>
+          </article>
+          <article class="card span-6">
+            <h3>한 문장씩 요약</h3>
+            <ul class="daily-list">
+              <li>Personal OS는 방향과 우선순위를 결정한다.</li>
+              <li>Main Workspace는 실제 실행 진입점을 제공한다.</li>
+              <li>Knowledge System은 재사용 가능한 지식만 장기 보관한다. UI는 Obsidian vault.</li>
+              <li>mem0는 개인적인 작업 방식과 선호를 학습한다.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="s2">
+        <div class="section-head">
+          <span class="section-no">2</span>
+          <div>
+            <h2>메인 루프</h2>
+            <p>이 구조는 `Capture → Plan → Execute → Distill → Review` 순환으로 보는 것이 가장 명확하다.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="loop">
+            <article class="loop-step" id="capture">
+              <b>1</b>
+              <strong>Capture</strong>
+              <span class="muted">아이디어, 링크, 메모, 할 일을 먼저 workspace inbox에 받는다.</span>
+            </article>
+            <article class="loop-step" id="plan">
+              <b>2</b>
+              <strong>Plan</strong>
+              <span class="muted">Personal OS가 우선순위를 정하고 workspace가 실행 문맥을 준비한다.</span>
+            </article>
+            <article class="loop-step" id="execute">
+              <b>3</b>
+              <strong>Execute</strong>
+              <span class="muted">작업은 항상 workspace에서 시작하고 에이전트는 여기에 붙는다.</span>
+            </article>
+            <article class="loop-step" id="distill">
+              <b>4</b>
+              <strong>Distill</strong>
+              <span class="muted">세션 종료 후 결과를 action, knowledge, memory로 분류한다.</span>
+            </article>
+            <article class="loop-step" id="review">
+              <b>5</b>
+              <strong>Review</strong>
+              <span class="muted">주간 리뷰에서 세 시스템을 다시 맞춘다.</span>
+            </article>
+          </div>
+          <div class="flow-note">
+            메인 워크스페이스는 이 루프의 중심 허브이지만, 모든 정보를 직접 소유하지는 않는다.
+            허브이자 라우터이지 최종 저장소는 아니다.
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="s3">
+        <div class="section-head">
+          <span class="section-no">3</span>
+          <div>
+            <h2>실행 파이프라인</h2>
+            <p>Planning과 Execution이 만나는 지점이 실제 사용감의 대부분을 결정한다.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-7">
+            <h3>Pipeline by stage</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Stage</th>
+                  <th>Who leads</th>
+                  <th>What happens</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Capture</td>
+                  <td>Main Workspace</td>
+                  <td>새 입력을 inbox로 받고 `actionable`, `knowledge`, `memory-candidate`로 1차 분류</td>
+                </tr>
+                <tr>
+                  <td>Plan</td>
+                  <td>Personal OS</td>
+                  <td>goal과 task 우선순위를 정하고, 해당 항목을 project card와 연결</td>
+                </tr>
+                <tr>
+                  <td>Execute</td>
+                  <td>Main Workspace</td>
+                  <td>경로 진입, 관련 파일 확인. <code>knowledge/projects/{slug}/</code>(사람 노트)와 <code>knowledge/wiki/</code>(LLM 합성, project_id 필터링), <a class="inline-link" href="./main-workspace-control-plane.html#mem0">mem0</a> 컨텍스트 로드</td>
+                </tr>
+                <tr>
+                  <td>Distill</td>
+                  <td>Main Workspace</td>
+                  <td>세션 결과를 task 업데이트, knowledge 승격 후보, mem0 후보로 나눔</td>
+                </tr>
+                <tr>
+                  <td>Review</td>
+                  <td>Personal OS</td>
+                  <td>우선순위 재정렬, 열린 루프 정리, 승격된 지식 점검</td>
+                </tr>
+              </tbody>
+            </table>
+          </article>
+          <article class="card span-5">
+            <h3>중요 원칙</h3>
+            <ul class="event-list">
+              <li>실행 중 발생하는 모든 메모를 곧바로 Knowledge System에 쓰지 않는다.</li>
+              <li>먼저 Workspace 로그에 쌓고, 세션 종료 후 장기 가치가 있는 것만 승격한다.</li>
+              <li>Personal OS는 실행 중간 상태보다 우선순위와 완료 여부만 신경쓴다.</li>
+              <li>mem0는 개인적이고 반복적인 패턴만 받는다.</li>
+            </ul>
+            <p class="muted" style="margin-top: 12px;">
+              이 파이프라인을 실제로 돌리는 저장소, 큐, 백업 계층은
+              <a class="inline-link" href="./workspace-infrastructure.html#s3">Infrastructure Blueprint</a>를 참고.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="s4">
+        <div class="section-head">
+          <span class="section-no">4</span>
+          <div>
+            <h2>세션 복구</h2>
+            <p>중단 후 재진입 비용을 낮추는 것이 workspace 설계의 실질적인 핵심이다.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-8">
+            <h3>Context Snapshot structure</h3>
+            <pre>session_id: ws-2026-06-02-001
+project: personal-os
+current_state: local routing cleanup in progress
+next_start: verify dashboard task grouping
+watchouts:
+  - queries.ts and local-router.ts are both changing
+references:
+  - README.md
+  - docs/main-workspace-control-plane.html
+decisions:
+  - keep project files outside workspace
+  - promote only stable knowledge to wiki</pre>
+          </article>
+          <article class="card span-4">
+            <h3>왜 중요한가</h3>
+            <ul class="event-list">
+              <li>다음 세션에서 설명을 다시 쓰지 않아도 된다.</li>
+              <li>에이전트가 중단 맥락을 재로딩할 수 있다.</li>
+              <li>작업 중이던 파일, 결정, 리스크가 함께 복구된다.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="s5">
+        <div class="section-head">
+          <span class="section-no">5</span>
+          <div>
+            <h2>정제와 승격</h2>
+            <p>세션 종료 후 어떤 정보를 어디로 올릴지 결정하는 단계가 가장 중요하다.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-6">
+            <h3>Action으로 보내는 것</h3>
+            <ul class="event-list">
+              <li>완료 상태 변경</li>
+              <li>다음 액션 생성</li>
+              <li>블로커 등록</li>
+              <li>우선순위 재평가 요청</li>
+            </ul>
+            <p class="muted">도착지: Personal OS</p>
+          </article>
+          <article class="card span-6">
+            <h3>Knowledge로 보내는 것</h3>
+            <ul class="event-list">
+              <li>재사용 가능한 설계 원칙 → <code>projects/{slug}/concepts/</code></li>
+              <li>아키텍처 결정과 이유 → <code>projects/{slug}/adr/</code></li>
+              <li>도메인 개념 정리 → <code>projects/{slug}/concepts/</code></li>
+              <li>반복 참고할 운영 절차 → <code>playbooks/</code></li>
+              <li>외부 자료(논문·문서) → <code>raw/</code> 에 드롭 → 에이전트가 <code>wiki/</code>에 합성</li>
+            </ul>
+            <p class="muted">도착지: Obsidian vault. 사람이 직접 쓰는 것은 <code>projects/</code>, 에이전트가 합성하는 것은 <code>wiki/</code>.</p>
+          </article>
+          <article class="card span-12">
+            <h3>Memory로 보내는 것</h3>
+            <div class="callout">
+              `나는 보통 어떤 방식으로 더 잘 일하는가`, `이 프로젝트에서 무엇을 반복적으로 선호하는가`,
+              `비슷한 작업이 오면 미리 기억해두면 좋은 것은 무엇인가` 같은 항목만
+              <a class="inline-link" href="./main-workspace-control-plane.html#mem0">mem0</a>에 넣는다.
+              사실 기록을 다 넣는 것이 아니라, 다음 행동의 질을 높일 패턴만 남기는 것이 맞다.
+            </div>
+            <div class="callout" style="margin-top:12px; background: var(--forest-soft);">
+              <strong>확정된 mem0 인프라</strong> —
+              대화 종료 후 <code>mem0ai</code>(npm)가 비동기로 기억 추출 요청.
+              추론은 <strong>Pi 5 Ollama</strong> (<code>gemma2:2b</code> 기억 추출 · <code>nomic-embed-text</code> 임베딩),
+              저장은 <strong>Mac Qdrant</strong> (Docker, <code>~/workspace/data/mem0/</code>).
+              LLM API 호출 비용 없음. Pi 미연결 시 추출 skip, 기존 기억 조회는 Qdrant에서 직접 가능.
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="s6">
+        <div class="section-head">
+          <span class="section-no">6</span>
+          <div>
+            <h2>공유 엔티티</h2>
+            <p>세 시스템이 공통으로 이해해야 하는 최소 엔티티만 정해두면 구조가 훨씬 단단해진다.</p>
+          </div>
+        </div>
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Entity</th>
+                <th>주요 소유자</th>
+                <th>다른 시스템과의 연결</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Project</td>
+                <td>Personal OS / Workspace</td>
+                <td>우선순위와 실제 경로를 연결</td>
+              </tr>
+              <tr>
+                <td>Goal</td>
+                <td>Personal OS</td>
+                <td>세션과 태스크가 왜 존재하는지 설명</td>
+              </tr>
+              <tr>
+                <td>Task</td>
+                <td>Personal OS</td>
+                <td>Workspace 세션의 직접적인 시작점</td>
+              </tr>
+              <tr>
+                <td>Session</td>
+                <td>Workspace</td>
+                <td>실행 중 발생한 상태와 로그 저장</td>
+              </tr>
+              <tr>
+                <td>Decision</td>
+                <td>Workspace</td>
+                <td>필요시 Knowledge System의 ADR로 승격</td>
+              </tr>
+              <tr>
+                <td>Knowledge Note</td>
+                <td>Knowledge System</td>
+                <td>다음 세션에서 다시 불러올 구조 문서가 됨</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="s7">
+        <div class="section-head">
+          <span class="section-no">7</span>
+          <div>
+            <h2>이벤트 예시</h2>
+            <p>이벤트 이름을 미리 정해두면 자동화와 에이전트 규칙이 쉬워진다.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-6">
+            <h3>대표 이벤트</h3>
+            <ul class="event-list">
+              <li><code>task_prioritized</code> → workspace가 project card 준비</li>
+              <li><code>session_started</code> → mem0 + wiki context 로드</li>
+              <li><code>decision_recorded</code> → knowledge 승격 후보 생성</li>
+              <li><code>session_closed</code> → snapshot 저장, next start 갱신</li>
+              <li><code>project_completed</code> → 회고와 장기 교훈 정리</li>
+            </ul>
+          </article>
+          <article class="card span-6">
+            <h3>자동화 포인트</h3>
+            <ul class="event-list">
+              <li>작업 종료 시 자동으로 다음 시작점 제안</li>
+              <li>반복적으로 등장한 패턴만 mem0 후보로 올리기</li>
+              <li>결정 로그 중 구조 관련 항목만 wiki 승격 후보로 표시</li>
+              <li>우선순위 변경 시 관련 프로젝트 카드에 상태 배지 갱신</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="s8">
+        <div class="section-head">
+          <span class="section-no">8</span>
+          <div>
+            <h2>일상 시나리오</h2>
+            <p>하루 단위로 보면 이 구조는 `판단 → 실행 → 학습` 루프로 읽힌다.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-4">
+            <h3>아침</h3>
+            <ul class="daily-list">
+              <li>Personal OS가 오늘의 우선순위를 정한다.</li>
+              <li>가장 중요한 프로젝트를 workspace로 보낸다.</li>
+            </ul>
+          </article>
+          <article class="card span-4">
+            <h3>작업 중</h3>
+            <ul class="daily-list">
+              <li>Workspace가 경로, 기억, 에이전트 프로필을 로드한다.</li>
+              <li>결정과 중간 상태는 session log에 쌓인다.</li>
+            </ul>
+          </article>
+          <article class="card span-4">
+            <h3>작업 후</h3>
+            <ul class="daily-list">
+              <li>결과는 action, knowledge, memory로 정제된다.</li>
+              <li>주간 리뷰에서 세 시스템이 다시 맞춰진다.</li>
+            </ul>
+          </article>
+          <article class="card span-12">
+            <p class="lead">
+              결국 좋은 구조는 세 시스템을 합치는 구조가 아니라,
+              <a class="inline-link" href="./main-workspace-control-plane.html">메인 워크스페이스가 세 시스템 사이를 오가며 일을 흐르게 만드는 구조</a>다.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <div class="footer-link">
+        <a class="inline-link" href="./main-workspace-control-plane.html">Return to Main Workspace Blueprint</a>
+        ·
+        <a class="inline-link" href="./workspace-infrastructure.html">Continue to Infrastructure Blueprint</a>
+      </div>
+    </div>
+  </body>
+</html>

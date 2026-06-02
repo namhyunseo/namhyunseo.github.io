@@ -1,0 +1,1438 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Workspace Infrastructure Blueprint</title>
+    <style>
+      :root {
+        --bg: #f3eee5;
+        --ink: #201c17;
+        --muted: #6b655b;
+        --surface: rgba(255, 251, 245, 0.84);
+        --surface-2: rgba(255, 255, 255, 0.72);
+        --line: rgba(73, 63, 48, 0.16);
+        --navy: #284c72;
+        --navy-soft: #dce8f4;
+        --forest: #1f6b54;
+        --forest-soft: #deeee6;
+        --amber: #9a6712;
+        --amber-soft: #f7e4b5;
+        --coral: #ae543f;
+        --coral-soft: #f1ddd6;
+        --shadow: 0 22px 60px rgba(41, 31, 17, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 10% 0%, rgba(220, 232, 244, 0.9), transparent 28%),
+          radial-gradient(circle at 90% 14%, rgba(222, 238, 230, 0.88), transparent 24%),
+          linear-gradient(180deg, #faf4ea 0%, var(--bg) 46%, #ebe1d0 100%);
+        font-family:
+          "Avenir Next", "Pretendard Variable", "Noto Sans KR", "Apple SD Gothic Neo",
+          sans-serif;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      h1,
+      h2,
+      h3,
+      p,
+      ul,
+      pre {
+        margin: 0;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      code {
+        padding: 1px 6px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.64);
+        font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+        font-size: 0.92em;
+      }
+
+      .wrap {
+        width: min(1160px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 32px 0 84px;
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        padding: 34px 34px 30px;
+        border-radius: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.56);
+        background:
+          linear-gradient(135deg, rgba(32, 55, 79, 0.96), rgba(31, 82, 70, 0.9)),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent);
+        color: #f8f4ee;
+        box-shadow: var(--shadow);
+      }
+
+      .hero:before,
+      .hero:after {
+        content: "";
+        position: absolute;
+        border-radius: 999px;
+        filter: blur(10px);
+      }
+
+      .hero:before {
+        width: 220px;
+        height: 220px;
+        right: -38px;
+        top: -56px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .hero:after {
+        width: 280px;
+        height: 280px;
+        left: -70px;
+        bottom: -154px;
+        background: rgba(247, 228, 181, 0.15);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 5px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.14);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .hero-grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.95fr);
+        gap: 22px;
+        margin-top: 18px;
+      }
+
+      .hero h1 {
+        max-width: 10ch;
+        font-family: "Iowan Old Style", "Palatino Linotype", serif;
+        font-size: clamp(2.45rem, 5vw, 4.45rem);
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+      }
+
+      .hero p {
+        margin-top: 14px;
+        max-width: 60ch;
+        color: rgba(248, 244, 238, 0.84);
+        font-size: 15.5px;
+      }
+
+      .hero-side {
+        display: grid;
+        gap: 12px;
+        align-self: end;
+        padding: 18px;
+        border-radius: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px);
+      }
+
+      .hero-side strong {
+        font-size: 13px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: rgba(248, 244, 238, 0.72);
+      }
+
+      .hero-side .big {
+        font-size: 20px;
+        line-height: 1.35;
+        font-weight: 700;
+      }
+
+      .doc-links,
+      .toc {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .doc-links {
+        margin-top: 18px;
+      }
+
+      .doc-link,
+      .toc a {
+        padding: 8px 12px;
+        border-radius: 999px;
+        text-decoration: none;
+        font-size: 13px;
+      }
+
+      .doc-link {
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .nav-shell {
+        position: sticky;
+        top: 16px;
+        z-index: 4;
+        margin: 18px 0 28px;
+        padding: 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.54);
+        background: rgba(255, 251, 245, 0.8);
+        backdrop-filter: blur(12px);
+      }
+
+      .toc a {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .section {
+        margin-top: 18px;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .section-no {
+        display: inline-grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        background: var(--navy-soft);
+        color: var(--navy);
+        font-weight: 800;
+      }
+
+      .section-head h2 {
+        font-size: 24px;
+        letter-spacing: -0.02em;
+      }
+
+      .section-head p,
+      .muted {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .inline-link {
+        color: var(--navy);
+        text-decoration: none;
+        font-weight: 700;
+        border-bottom: 1px solid rgba(40, 76, 114, 0.28);
+      }
+
+      .lead {
+        font-size: 19px;
+        line-height: 1.52;
+        letter-spacing: -0.01em;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .card {
+        padding: 22px;
+        border-radius: 24px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        box-shadow: 0 10px 32px rgba(53, 40, 23, 0.06);
+        backdrop-filter: blur(10px);
+      }
+
+      .span-12 {
+        grid-column: span 12;
+      }
+
+      .span-8 {
+        grid-column: span 8;
+      }
+
+      .span-7 {
+        grid-column: span 7;
+      }
+
+      .span-6 {
+        grid-column: span 6;
+      }
+
+      .span-5 {
+        grid-column: span 5;
+      }
+
+      .span-4 {
+        grid-column: span 4;
+      }
+
+      .principles,
+      .services,
+      .phases {
+        display: grid;
+        gap: 10px;
+      }
+
+      .item {
+        padding: 14px 16px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: var(--surface-2);
+      }
+
+      .item strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 15px;
+      }
+
+      .stack {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .architecture {
+        display: grid;
+        gap: 16px;
+      }
+
+      .diagram-shell {
+        padding: 18px;
+        border-radius: 22px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.66);
+      }
+
+      .diagram-shell h3,
+      .system-map h3 {
+        margin-bottom: 12px;
+        font-size: 18px;
+        letter-spacing: -0.02em;
+      }
+
+      .diagram-shell svg,
+      .system-map svg {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .diagram-caption {
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .arch-stage {
+        display: grid;
+        gap: 10px;
+        padding: 18px;
+        border-radius: 20px;
+        border: 1px solid var(--line);
+        background: var(--surface-2);
+      }
+
+      .arch-stage header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .arch-stage header strong {
+        font-size: 18px;
+      }
+
+      .arch-tag {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .tag-ui {
+        background: var(--navy-soft);
+        color: var(--navy);
+      }
+
+      .tag-core {
+        background: var(--forest-soft);
+        color: var(--forest);
+      }
+
+      .tag-store {
+        background: var(--amber-soft);
+        color: var(--amber);
+      }
+
+      .tag-sync {
+        background: var(--coral-soft);
+        color: var(--coral);
+      }
+
+      .arch-grid {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .arch-node {
+        display: grid;
+        gap: 6px;
+        min-height: 100%;
+        padding: 14px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.7);
+      }
+
+      .arch-node strong {
+        font-size: 15px;
+      }
+
+      .arch-node small {
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.03em;
+      }
+
+      .arch-span-12 {
+        grid-column: span 12;
+      }
+
+      .arch-span-8 {
+        grid-column: span 8;
+      }
+
+      .arch-span-6 {
+        grid-column: span 6;
+      }
+
+      .arch-span-4 {
+        grid-column: span 4;
+      }
+
+      .arch-arrow {
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        font-size: 20px;
+        font-weight: 800;
+      }
+
+      .arch-note {
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: rgba(220, 232, 244, 0.45);
+        border: 1px solid rgba(40, 76, 114, 0.16);
+      }
+
+      .system-map {
+        display: grid;
+        gap: 14px;
+      }
+
+      .system-map-note {
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: rgba(222, 238, 230, 0.5);
+        border: 1px solid rgba(31, 107, 84, 0.16);
+      }
+
+      .layer {
+        display: grid;
+        gap: 8px;
+        padding: 18px 16px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: var(--surface-2);
+      }
+
+      .layer b {
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .layer strong {
+        font-size: 17px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+        font-size: 14px;
+      }
+
+      th {
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        background: rgba(255, 255, 255, 0.46);
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .bullet-list {
+        padding-left: 18px;
+      }
+
+      .bullet-list li {
+        margin: 8px 0;
+      }
+
+      .code {
+        overflow-x: auto;
+        margin-top: 12px;
+        padding: 18px;
+        border-radius: 18px;
+        background: #241f19;
+        color: #f4eadb;
+        font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .footer-link {
+        margin-top: 24px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      @media (max-width: 960px) {
+        .hero-grid,
+        .stack,
+        .arch-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .span-8,
+        .span-7,
+        .span-6,
+        .span-5,
+        .span-4 {
+          grid-column: span 12;
+        }
+
+        .arch-span-12,
+        .arch-span-8,
+        .arch-span-6,
+        .arch-span-4 {
+          grid-column: span 12;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="hero">
+        <span class="eyebrow">Infrastructure Blueprint</span>
+        <div class="hero-grid">
+          <div>
+            <h1>Local-first Infrastructure for the Workspace</h1>
+            <p>
+              이 문서는 <a class="inline-link" href="./main-workspace-control-plane.html">Main Workspace</a>,
+              <a class="inline-link" href="./workspace-interaction-pipeline.html">Interaction Pipeline</a>를 실제로 받쳐줄
+              인프라 구조를 설명한다. 목표는 처음부터 분산 시스템을 짓는 것이 아니라,
+              `혼자서 안정적으로 쓰기 좋은 로컬 우선 인프라`를 만들고 필요한 지점만 점진적으로 외부 서비스와 연결하는 것이다.
+            </p>
+          </div>
+          <aside class="hero-side">
+            <strong>Recommended posture</strong>
+            <div class="big">앱은 로컬에서 돌아가고, 데이터는 로컬에 남기고, 백업과 동기화만 별도 레이어로 분리한다.</div>
+            <div class="muted">즉, runtime과 source of truth는 로컬. 클라우드는 복제와 공유를 위해서만 쓴다.</div>
+          </aside>
+        </div>
+        <div class="doc-links">
+          <a class="doc-link" href="./main-workspace-control-plane.html">Main Workspace Blueprint</a>
+          <a class="doc-link" href="./workspace-interaction-pipeline.html">Interaction Pipeline</a>
+          <a class="doc-link" href="#s2">Jump to Runtime Layers</a>
+        </div>
+      </header>
+
+      <div class="nav-shell">
+        <nav class="toc" aria-label="Document sections">
+          <a href="#s1">원칙</a>
+          <a href="#s2">런타임 계층</a>
+          <a href="#architecture">시스템 아키텍처</a>
+          <a href="#s3">저장소 설계</a>
+          <a href="#s4">서비스 구성</a>
+          <a href="#s5">동기화와 백업</a>
+          <a href="#s6">보안</a>
+          <a href="#s7">권장 단계</a>
+          <a href="#s8">최소 스택</a>
+          <a href="#s9">Raspberry Pi</a>
+        </nav>
+      </div>
+
+      <section class="section" id="s1">
+        <div class="section-head">
+          <span class="section-no">1</span>
+          <div>
+            <h2>원칙</h2>
+            <p>처음부터 복잡한 인프라를 만들면 시스템보다 운영 비용이 더 커진다.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-7">
+            <p class="lead">
+              이 시스템은 팀용 SaaS보다 개인용 운영체계에 가깝기 때문에,
+              `고가용성`보다 `낮은 마찰`, `빠른 복구`, `문맥 보존`, `에이전트 친화성`이 더 중요하다.
+              따라서 인프라 설계도 서버 중심이 아니라 `로컬 워크스테이션 중심`으로 가는 편이 맞다.
+            </p>
+          </article>
+          <article class="card span-5">
+            <div class="principles">
+              <div class="item">
+                <strong>Local-first</strong>
+                <span>실행과 저장의 기준은 로컬 머신이다.</span>
+              </div>
+              <div class="item">
+                <strong>Composable</strong>
+                <span>Personal OS, Workspace, Knowledge를 느슨하게 연결한다.</span>
+              </div>
+              <div class="item">
+                <strong>Event-friendly</strong>
+                <span>기능 호출보다 이벤트 로그와 후처리에 강한 구조가 좋다.</span>
+              </div>
+              <div class="item">
+                <strong>Recoverable</strong>
+                <span>실패했을 때 로그, 스냅샷, 백업으로 복구 가능해야 한다.</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="s2">
+        <div class="section-head">
+          <span class="section-no">2</span>
+          <div>
+            <h2>런타임 계층</h2>
+            <p>실제 인프라는 역할에 따라 5개 레이어로 나누는 것이 가장 명확하다.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="stack">
+            <article class="layer">
+              <b>Layer 1</b>
+              <strong>Interface</strong>
+              <span class="muted">Tauri 또는 로컬 웹 UI. 사람이 보는 화면과 에이전트 진입점.</span>
+            </article>
+            <article class="layer">
+              <b>Layer 2</b>
+              <strong>Control Plane</strong>
+              <span class="muted">project registry, session orchestration, command routing.</span>
+            </article>
+            <article class="layer">
+              <b>Layer 3</b>
+              <strong>Memory Plane</strong>
+              <span class="muted">mem0, LLM wiki (<code>knowledge/wiki/</code> — raw/ 자료를 에이전트가 합성), session logs, decision ledger.</span>
+            </article>
+            <article class="layer">
+              <b>Layer 4</b>
+              <strong>Execution Plane</strong>
+              <span class="muted">에이전트 실행, 파일 접근, 명령 실행, ingestion jobs.</span>
+            </article>
+            <article class="layer">
+              <b>Layer 5</b>
+              <strong>Sync / Backup</strong>
+              <span class="muted">Git, cloud backup, encrypted snapshot, optional remote mirror.</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="architecture">
+        <div class="section-head">
+          <span class="section-no">2A</span>
+          <div>
+            <h2>시스템 아키텍처</h2>
+            <p>한눈에 보면 이 시스템은 `로컬 앱 코어 + 분리된 기억 계층 + 느슨한 백업 계층` 구조다.</p>
+          </div>
+        </div>
+        <div class="card architecture">
+          <div class="diagram-shell">
+            <h3>SVG Overview</h3>
+            <svg viewBox="0 0 1120 500" role="img" aria-label="Workspace infrastructure architecture diagram">
+              <defs>
+                <linearGradient id="gradUi" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#dce8f4" />
+                  <stop offset="100%" stop-color="#eef5fb" />
+                </linearGradient>
+                <linearGradient id="gradCore" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#deeee6" />
+                  <stop offset="100%" stop-color="#f2faf6" />
+                </linearGradient>
+                <linearGradient id="gradStore" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#f7e4b5" />
+                  <stop offset="100%" stop-color="#fcf3db" />
+                </linearGradient>
+                <linearGradient id="gradSync" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#f1ddd6" />
+                  <stop offset="100%" stop-color="#faefeb" />
+                </linearGradient>
+                <marker id="arrowHead" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+                  <path d="M0,0 L10,5 L0,10 z" fill="#7a7266"></path>
+                </marker>
+              </defs>
+
+              <rect x="40" y="28" width="1040" height="446" rx="26" fill="rgba(255,251,245,0.9)" stroke="rgba(73,63,48,0.12)" />
+
+              <rect x="76" y="56" width="300" height="120" rx="22" fill="url(#gradUi)" stroke="rgba(40,76,114,0.22)" />
+              <text x="100" y="90" font-size="13" font-weight="800" fill="#284c72">INTERFACE</text>
+              <text x="100" y="122" font-size="24" font-weight="700" fill="#1f2f3f">Desktop UI</text>
+              <text x="100" y="148" font-size="13" fill="#52606d">Tauri / local React / agent</text>
+              <text x="100" y="168" font-size="13" fill="#6b655b">Command palette · session entry</text>
+
+              <rect x="412" y="56" width="300" height="120" rx="22" fill="url(#gradCore)" stroke="rgba(31,107,84,0.22)" />
+              <text x="436" y="90" font-size="13" font-weight="800" fill="#1f6b54">CONTROL PLANE</text>
+              <text x="436" y="122" font-size="24" font-weight="700" fill="#20332b">Workspace Core</text>
+              <text x="436" y="148" font-size="13" fill="#52606d">Registry · orchestration · routing</text>
+              <text x="436" y="168" font-size="13" fill="#6b655b">Hub for all work sessions</text>
+
+              <rect x="748" y="56" width="296" height="120" rx="22" fill="url(#gradCore)" stroke="rgba(31,107,84,0.22)" />
+              <text x="772" y="90" font-size="13" font-weight="800" fill="#1f6b54">EXECUTION + MEMORY</text>
+              <text x="772" y="122" font-size="24" font-weight="700" fill="#20332b">Service Layer</text>
+              <text x="772" y="148" font-size="13" fill="#52606d">Executor · wiki ingestor</text>
+              <text x="772" y="168" font-size="13" fill="#6b655b">mem0 adapter · schedulers</text>
+
+              <rect x="76" y="250" width="300" height="130" rx="22" fill="url(#gradStore)" stroke="rgba(154,103,18,0.22)" />
+              <text x="100" y="284" font-size="13" font-weight="800" fill="#9a6712">SOURCE OF TRUTH</text>
+              <text x="100" y="316" font-size="24" font-weight="700" fill="#47321a">Operational DB</text>
+              <text x="100" y="344" font-size="13" fill="#6b655b">tasks · goals · sessions · queues</text>
+              <text x="100" y="366" font-size="13" fill="#6b655b">SQLite / PGlite</text>
+
+              <rect x="412" y="250" width="300" height="130" rx="22" fill="url(#gradStore)" stroke="rgba(154,103,18,0.22)" />
+              <text x="436" y="284" font-size="13" font-weight="800" fill="#9a6712">LONG-TERM KNOWLEDGE</text>
+              <text x="436" y="316" font-size="24" font-weight="700" fill="#47321a">Knowledge Store</text>
+              <text x="436" y="344" font-size="13" fill="#6b655b">wiki/ (LLM) · projects/ (사람)</text>
+              <text x="436" y="366" font-size="13" fill="#6b655b">Obsidian vault · raw/ 입력</text>
+
+              <rect x="748" y="250" width="296" height="130" rx="22" fill="url(#gradStore)" stroke="rgba(154,103,18,0.22)" />
+              <text x="772" y="284" font-size="13" font-weight="800" fill="#9a6712">EVENTS + ARTIFACTS</text>
+              <text x="772" y="316" font-size="24" font-weight="700" fill="#47321a">Logs and Files</text>
+              <text x="772" y="344" font-size="13" fill="#6b655b">snapshots · logs · exports</text>
+              <text x="772" y="366" font-size="13" fill="#6b655b">JSONL + local filesystem</text>
+
+              <rect x="300" y="414" width="520" height="52" rx="18" fill="url(#gradSync)" stroke="rgba(174,84,63,0.22)" />
+              <text x="324" y="440" font-size="13" font-weight="800" fill="#ae543f">EXTERNAL SAFETY LAYER</text>
+              <text x="324" y="458" font-size="12.5" fill="#6b655b">Git sync · encrypted snapshots · optional remote mirror</text>
+
+              <line x1="376" y1="116" x2="408" y2="116" stroke="#7a7266" stroke-width="3" marker-end="url(#arrowHead)" />
+              <line x1="712" y1="116" x2="744" y2="116" stroke="#7a7266" stroke-width="3" marker-end="url(#arrowHead)" />
+              <line x1="226" y1="176" x2="226" y2="246" stroke="#7a7266" stroke-width="3" marker-end="url(#arrowHead)" />
+              <line x1="562" y1="176" x2="562" y2="246" stroke="#7a7266" stroke-width="3" marker-end="url(#arrowHead)" />
+              <line x1="896" y1="176" x2="896" y2="246" stroke="#7a7266" stroke-width="3" marker-end="url(#arrowHead)" />
+              <line x1="560" y1="380" x2="560" y2="410" stroke="#7a7266" stroke-width="3" marker-end="url(#arrowHead)" />
+            </svg>
+            <p class="diagram-caption">
+              읽는 순서는 좌상단에서 우하단이다. `UI/Agent`가 `Workspace Core`에 붙고, 코어는 실행 서비스와 저장 계층을 제어하며, 외부는 백업과 동기화만 담당한다.
+            </p>
+          </div>
+
+          <div class="system-map">
+            <h3>Integrated System Map</h3>
+            <svg viewBox="0 0 1120 500" role="img" aria-label="Integrated map of Personal OS, Main Workspace, Knowledge System, and mem0">
+              <defs>
+                <marker id="flowArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+                  <path d="M0,0 L10,5 L0,10 z" fill="#6f675b"></path>
+                </marker>
+              </defs>
+
+              <rect x="30" y="28" width="1060" height="446" rx="28" fill="rgba(255,251,245,0.9)" stroke="rgba(73,63,48,0.12)" />
+
+              <rect x="66" y="60" width="280" height="140" rx="24" fill="#dce8f4" stroke="rgba(40,76,114,0.24)" />
+              <text x="90" y="98" font-size="13" font-weight="800" fill="#284c72">DECISION LAYER</text>
+              <text x="90" y="132" font-size="26" font-weight="700" fill="#20324a">Personal OS</text>
+              <text x="90" y="160" font-size="13" fill="#5a6774">priorities · goals · reviews</text>
+              <text x="90" y="182" font-size="13" fill="#5a6774">decides what matters now</text>
+
+              <rect x="420" y="52" width="300" height="162" rx="26" fill="#deeee6" stroke="rgba(31,107,84,0.24)" />
+              <text x="444" y="88" font-size="13" font-weight="800" fill="#1f6b54">EXECUTION HUB</text>
+              <text x="444" y="124" font-size="28" font-weight="700" fill="#20342d">Main Workspace</text>
+              <text x="444" y="152" font-size="13" fill="#596760">registry · orchestration · routing</text>
+              <text x="444" y="174" font-size="13" fill="#596760">starts work · restores context</text>
+              <rect x="444" y="186" width="118" height="24" rx="12" fill="rgba(255,255,255,0.7)" />
+              <text x="456" y="202" font-size="12" font-weight="700" fill="#1f6b54">project cards</text>
+              <rect x="574" y="186" width="118" height="24" rx="12" fill="rgba(255,255,255,0.7)" />
+              <text x="586" y="202" font-size="12" font-weight="700" fill="#1f6b54">session logs</text>
+
+              <rect x="800" y="60" width="254" height="140" rx="24" fill="#f7e4b5" stroke="rgba(154,103,18,0.24)" />
+              <text x="824" y="98" font-size="13" font-weight="800" fill="#9a6712">KNOWLEDGE LAYER</text>
+              <text x="824" y="132" font-size="22" font-weight="700" fill="#4b3518">Knowledge System</text>
+              <text x="824" y="160" font-size="12" fill="#6b655b">architecture · concepts · ADR</text>
+              <text x="824" y="182" font-size="12" fill="#6b655b">stable, reusable knowledge</text>
+
+              <rect x="66" y="286" width="280" height="150" rx="22" fill="#fff4dc" stroke="rgba(154,103,18,0.18)" />
+              <text x="90" y="322" font-size="13" font-weight="800" fill="#9a6712">OUTPUT TYPES</text>
+              <text x="90" y="356" font-size="15" fill="#6b655b">action updates</text>
+              <text x="90" y="382" font-size="15" fill="#6b655b">knowledge promotion</text>
+              <text x="90" y="408" font-size="15" fill="#6b655b">memory candidates</text>
+
+              <rect x="420" y="286" width="300" height="150" rx="24" fill="rgba(255,255,255,0.76)" stroke="rgba(73,63,48,0.16)" />
+              <text x="444" y="322" font-size="13" font-weight="800" fill="#284c72">SESSION LOOP</text>
+              <text x="444" y="356" font-size="16" font-weight="700" fill="#20324a">Capture → Plan → Execute</text>
+              <text x="444" y="380" font-size="16" font-weight="700" fill="#20324a">→ Distill → Review</text>
+              <text x="444" y="410" font-size="12" fill="#6b655b">Workspace is the moving center.</text>
+
+              <rect x="800" y="286" width="254" height="150" rx="24" fill="#f1ddd6" stroke="rgba(174,84,63,0.24)" />
+              <text x="824" y="322" font-size="13" font-weight="800" fill="#ae543f">PERSONAL MEMORY</text>
+              <text x="824" y="360" font-size="26" font-weight="700" fill="#4c2b24">mem0</text>
+              <text x="824" y="388" font-size="12" fill="#6b655b">preferences · habits · patterns</text>
+              <text x="824" y="410" font-size="12" fill="#6b655b">improves future execution</text>
+
+              <line x1="346" y1="130" x2="416" y2="130" stroke="#6f675b" stroke-width="3" marker-end="url(#flowArrow)" />
+              <line x1="720" y1="130" x2="796" y2="130" stroke="#6f675b" stroke-width="3" marker-end="url(#flowArrow)" />
+              <line x1="570" y1="214" x2="570" y2="282" stroke="#6f675b" stroke-width="3" marker-end="url(#flowArrow)" />
+              <line x1="720" y1="360" x2="796" y2="360" stroke="#6f675b" stroke-width="3" marker-end="url(#flowArrow)" />
+              <line x1="420" y1="360" x2="350" y2="360" stroke="#6f675b" stroke-width="3" marker-end="url(#flowArrow)" />
+              <line x1="927" y1="200" x2="927" y2="282" stroke="#b8ae9f" stroke-width="2.5" stroke-dasharray="8 8" />
+
+              <text x="352" y="123" font-size="12" font-weight="700" fill="#6f675b">prioritize</text>
+              <text x="726" y="123" font-size="12" font-weight="700" fill="#6f675b">promote</text>
+              <text x="578" y="254" font-size="12" font-weight="700" fill="#6f675b">run loop</text>
+              <text x="724" y="353" font-size="12" font-weight="700" fill="#6f675b">remember</text>
+              <text x="360" y="353" font-size="12" font-weight="700" fill="#6f675b">emit</text>
+            </svg>
+            <div class="system-map-note">
+              통합 맵에서 `Main Workspace`가 중심에 있는 이유는 모든 것을 소유해서가 아니라,
+              세 시스템 사이의 흐름을 조정하기 때문이다. `Personal OS`는 우선순위를 밀어 넣고,
+              `Workspace`는 실행하며, `Knowledge System`과 `mem0`는 세션 결과 중 남겨야 할 것만 각각 가져간다.
+            </div>
+          </div>
+
+          <div class="arch-stage">
+            <header>
+              <strong>User / Agent Entry</strong>
+              <span class="arch-tag tag-ui">Interface</span>
+            </header>
+            <div class="arch-grid">
+              <article class="arch-node arch-span-6">
+                <strong>Desktop UI</strong>
+                <small>Tauri / local React app</small>
+                <span>대시보드, 프로젝트 카드, 세션 시작, 로그 확인.</span>
+              </article>
+              <article class="arch-node arch-span-6">
+                <strong>Agent Entry Point</strong>
+                <small>command palette / CLI / sidecar</small>
+                <span>`start session`, `open project`, `capture note` 같은 실행 진입점.</span>
+              </article>
+            </div>
+          </div>
+
+          <div class="arch-arrow">↓</div>
+
+          <div class="arch-stage">
+            <header>
+              <strong>Workspace Core</strong>
+              <span class="arch-tag tag-core">Control Plane</span>
+            </header>
+            <div class="arch-grid">
+              <article class="arch-node arch-span-4">
+                <strong>Project Registry</strong>
+                <small>workspace metadata</small>
+                <span>경로, 실행 명령, 관련 문서, agent profile 관리.</span>
+              </article>
+              <article class="arch-node arch-span-4">
+                <strong>Session Orchestrator</strong>
+                <small>workflow runtime</small>
+                <span>세션 시작, 재진입, 종료 후 정제 루프를 조정.</span>
+              </article>
+              <article class="arch-node arch-span-4">
+                <strong>Routing Engine</strong>
+                <small>memory / action router</small>
+                <span>결과를 Personal OS, wiki, mem0, logs 중 어디로 보낼지 결정.</span>
+              </article>
+            </div>
+          </div>
+
+          <div class="arch-arrow">↓</div>
+
+          <div class="arch-stage">
+            <header>
+              <strong>Execution and Memory Services</strong>
+              <span class="arch-tag tag-core">Execution Plane</span>
+            </header>
+            <div class="arch-grid">
+              <article class="arch-node arch-span-4">
+                <strong>File / Command Executor</strong>
+                <small>tool runtime</small>
+                <span>파일 읽기, 수정, 스크립트 실행, 프로젝트 탐색.</span>
+              </article>
+              <article class="arch-node arch-span-4">
+                <strong>Knowledge Ingestor</strong>
+                <small>wiki pipeline</small>
+                <span>장기 문서 후보를 정리하고 지식 저장소에 반영.</span>
+              </article>
+              <article class="arch-node arch-span-4">
+                <strong>Memory Adapter</strong>
+                <small>mem0 connector</small>
+                <span>개인 선호와 반복 패턴을 읽고 쓰는 계층.</span>
+              </article>
+            </div>
+          </div>
+
+          <div class="arch-arrow">↓</div>
+
+          <div class="arch-stage">
+            <header>
+              <strong>Local Storage Layer</strong>
+              <span class="arch-tag tag-store">Source of Truth</span>
+            </header>
+            <div class="arch-grid">
+              <article class="arch-node arch-span-4">
+                <strong>Operational DB</strong>
+                <small>SQLite / PGlite</small>
+                <span>tasks, goals, project state, session index, queues.</span>
+              </article>
+              <article class="arch-node arch-span-4">
+                <strong>Knowledge Store</strong>
+                <small>Obsidian vault</small>
+                <span>architecture notes, concepts, ADR, reusable references. PDF · 첨부파일 포함.</span>
+              </article>
+              <article class="arch-node arch-span-4">
+                <strong>Event + Artifact Store</strong>
+                <small>JSONL + local files</small>
+                <span>session logs, snapshots, screenshots, exports, generated artifacts.</span>
+              </article>
+            </div>
+          </div>
+
+          <div class="arch-arrow">↓</div>
+
+          <div class="arch-stage">
+            <header>
+              <strong>Externalized Safety Layer</strong>
+              <span class="arch-tag tag-sync">Backup / Sync</span>
+            </header>
+            <div class="arch-grid">
+              <article class="arch-node arch-span-6">
+                <strong>Versioned Knowledge Sync</strong>
+                <small>Git or remote repo</small>
+                <span>지식 문서와 플레이북을 버전 관리하고 필요시 다른 기기와 동기화.</span>
+              </article>
+              <article class="arch-node arch-span-6">
+                <strong>Encrypted Snapshot Backup</strong>
+                <small>cloud archive / external disk</small>
+                <span>DB 스냅샷과 artifacts를 주기적으로 백업. 실시간 source of truth 아님.</span>
+              </article>
+            </div>
+          </div>
+
+          <div class="arch-note">
+            아키텍처 관점에서 가장 중요한 규칙은 이것이다.
+            `로컬 스토리지가 기준 시스템이고, 외부 레이어는 복제본과 안전장치일 뿐`이다.
+            이 점이 흐려지면 sync 충돌과 운영 복잡도가 빠르게 커진다.
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="s3">
+        <div class="section-head">
+          <span class="section-no">3</span>
+          <div>
+            <h2>저장소 설계</h2>
+            <p>가장 중요한 결정은 데이터를 하나의 DB에 다 집어넣지 않는 것이다.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-8">
+            <h3>권장 저장소 분리</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Storage</th>
+                  <th>용도</th>
+                  <th>추천 형태</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Operational DB</td>
+                  <td>task, project, goal, session index, action queue</td>
+                  <td>SQLite 또는 PGlite. 이후 필요하면 Postgres로 승격.</td>
+                </tr>
+                <tr>
+                  <td>Knowledge Store</td>
+                  <td>구조화된 장기 문서, ADR, 도메인 노트, PDF · 참고 자료, LLM 합성 wiki</td>
+                  <td>
+                    Obsidian vault 안에 두 계층.<br>
+                    <strong>projects/{slug}/</strong> — 사람이 직접 쓰는 ADR, 개념, 레퍼런스. YAML frontmatter가 source of truth. PGlite <code>knowledge_index</code>는 파생 검색 캐시.<br>
+                    <strong>wiki/</strong> — 에이전트가 <code>raw/</code> 자료를 읽고 합성한 페이지. 전역 하나, frontmatter project_id 태그로 필터링.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Memory Store</td>
+                  <td>mem0용 사용자 선호, 반복 패턴, 개인 문맥</td>
+                  <td>
+                    <strong>Qdrant</strong> (Mac Docker, <code>~/workspace/data/mem0/</code>) — 벡터 저장소.<br>
+                    <strong>Ollama on Pi 5</strong> — LLM 추론 (<code>gemma2:2b</code> 기억 추출, <code>nomic-embed-text</code> 임베딩).<br>
+                    <strong>mem0ai</strong> (npm) — 앱과 Qdrant·Ollama를 연결하는 어댑터. 대화 종료 후 비동기로 기억 추출·저장.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Event Log</td>
+                  <td>session lifecycle, routing events, sync history</td>
+                  <td>append-only JSONL 또는 DB event table.</td>
+                </tr>
+                <tr>
+                  <td>Artifact Store</td>
+                  <td>첨부 이미지, exports, snapshots, generated files</td>
+                  <td>로컬 파일 시스템.</td>
+                </tr>
+              </tbody>
+            </table>
+          </article>
+          <article class="card span-4">
+            <h3>왜 분리하나</h3>
+            <ul class="bullet-list">
+              <li>운영 데이터와 지식 데이터를 같은 스키마에 섞으면 진화가 어렵다.</li>
+              <li>mem0 성격의 데이터는 일반 업무 테이블과 관리 규칙이 다르다.</li>
+              <li>event log는 수정보다 추적과 복구가 중요하다.</li>
+              <li>파일 아티팩트는 DB보다 파일 시스템이 단순하다.</li>
+            </ul>
+          </article>
+          <article class="card span-12">
+            <h3>초기 디렉터리 예시</h3>
+            <div class="code">~/workspace/
+
+  raw/                          ← LLM wiki 입력 드롭 존 (.gitignore)
+    shared/                     ← 프로젝트 무관 자료
+    personal-os/                ← 프로젝트 힌트 (선택)
+
+  knowledge/                    ← Obsidian vault 루트
+    wiki/                       ← LLM 합성 페이지 (전역 하나)
+      index.md
+      log.md
+      [topic].md                ← frontmatter: project_id: [personal-os, ...]
+    projects/
+      personal-os/              ← 사람이 직접 쓰는 노트
+        adr/
+        concepts/
+        references/
+        attachments/
+    shared/                     ← 프로젝트 무관 공통 지식
+    playbooks/
+
+  data/                         ← 런타임 데이터 (.gitignore)
+    db/
+      app.db                    ← PGlite (tasks, goals, knowledge_index)
+    sessions/
+      sessions.jsonl
+      snapshots/
+    mem0/
+
+  artifacts/                    ← 생성 파일 (.gitignore)
+    screenshots/
+    exports/
+    generated/
+
+  backups/                      ← 백업 (.gitignore)
+    daily/
+    weekly/</div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="s4">
+        <div class="section-head">
+          <span class="section-no">4</span>
+          <div>
+            <h2>서비스 구성</h2>
+            <p>서비스는 많이 둘수록 좋은 게 아니라, 분리 이유가 분명할 때만 추가해야 한다.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-6">
+            <h3>처음부터 필요한 것</h3>
+            <div class="services">
+              <div class="item">
+                <strong>UI runtime</strong>
+                <span>Tauri 또는 localhost 기반 Next 앱.</span>
+              </div>
+              <div class="item">
+                <strong>Local DB runtime</strong>
+                <span>SQLite/PGlite를 직접 임베드.</span>
+              </div>
+              <div class="item">
+                <strong>Job runner</strong>
+                <span>ingestion, backup, sync, summarization 같은 백그라운드 작업.</span>
+              </div>
+              <div class="item">
+                <strong>File indexer</strong>
+                <span>프로젝트 카드 기준으로 파일/폴더 메타데이터 스캔.</span>
+              </div>
+            </div>
+          </article>
+          <article class="card span-6">
+            <h3>나중에 붙이면 되는 것</h3>
+            <div class="services">
+              <div class="item">
+                <strong>Vector search</strong>
+                <span>지식 검색 정확도가 부족해질 때만 추가.</span>
+              </div>
+              <div class="item">
+                <strong>Remote Postgres</strong>
+                <span>여러 기기 실시간 동기화가 정말 필요할 때.</span>
+              </div>
+              <div class="item">
+                <strong>Message queue</strong>
+                <span>작업량이 많고 비동기 후처리가 복잡해질 때.</span>
+              </div>
+              <div class="item">
+                <strong>Shared API server</strong>
+                <span>혼자 쓰는 단계에서는 대부분 불필요.</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="s5">
+        <div class="section-head">
+          <span class="section-no">5</span>
+          <div>
+            <h2>동기화와 백업</h2>
+            <p>동기화와 source of truth는 같은 개념이 아니다. 이 둘을 분리해야 데이터가 안정된다.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-7">
+            <h3>추천 전략</h3>
+            <ul class="bullet-list">
+              <li>로컬 DB는 주기적으로 스냅샷 백업.</li>
+              <li>knowledge 폴더는 Git으로 버전 관리.</li>
+              <li>artifacts와 snapshots는 날짜 기반 압축 백업.</li>
+              <li>복구 우선순위는 `DB → knowledge → artifacts → cache` 순으로 정의.</li>
+              <li>동기화는 pull/push보다 `export/import + conflict review`가 더 안전할 수 있다.</li>
+            </ul>
+          </article>
+          <article class="card span-5">
+            <h3>피해야 할 것</h3>
+            <ul class="bullet-list">
+              <li>DB 파일을 Dropbox/iCloud와 실시간 동기화하는 것</li>
+              <li>mem0와 wiki를 같은 백업 정책으로 다루는 것</li>
+              <li>실행 중 DB를 바로 원격 미러링하는 것</li>
+              <li>복구 절차 없이 백업만 쌓아두는 것</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="s6">
+        <div class="section-head">
+          <span class="section-no">6</span>
+          <div>
+            <h2>보안</h2>
+            <p>개인 시스템이라도 에이전트가 파일과 명령에 접근하므로 권한 경계는 필요하다.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-6">
+            <h3>권한 분리</h3>
+            <ul class="bullet-list">
+              <li>workspace는 프로젝트 경로를 등록하되, 모든 경로를 기본 허용하지 않는다.</li>
+              <li>에이전트별로 읽기 전용과 편집 가능 경로를 나눈다.</li>
+              <li>secret은 OS keychain 또는 별도 env vault에 둔다.</li>
+              <li>승인 없는 destructive action은 막는다.</li>
+            </ul>
+          </article>
+          <article class="card span-6">
+            <h3>로그 위생</h3>
+            <ul class="bullet-list">
+              <li>session log에는 API key, 토큰, 민감 원문을 남기지 않는다.</li>
+              <li>knowledge 승격 전 민감정보 필터를 둔다.</li>
+              <li>백업 파일 암호화 여부를 단계별로 결정한다.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="s7">
+        <div class="section-head">
+          <span class="section-no">7</span>
+          <div>
+            <h2>권장 단계</h2>
+            <p>한 번에 완성하려 하지 말고 3단계로 가는 편이 현실적이다.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-4">
+            <h3>Phase 1</h3>
+            <div class="phases">
+              <div class="item">
+                <strong>Single-machine</strong>
+                <span>로컬 DB, local files, simple job runner, manual backup.</span>
+              </div>
+            </div>
+          </article>
+          <article class="card span-4">
+            <h3>Phase 2</h3>
+            <div class="phases">
+              <div class="item">
+                <strong>Structured sync</strong>
+                <span>knowledge Git sync, scheduled DB snapshots, mem0 export/import.</span>
+              </div>
+            </div>
+          </article>
+          <article class="card span-4">
+            <h3>Phase 3</h3>
+            <div class="phases">
+              <div class="item">
+                <strong>Optional remote mirror</strong>
+                <span>원격 읽기용 복제본이나 여러 기기용 sync coordinator 추가.</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="s8">
+        <div class="section-head">
+          <span class="section-no">8</span>
+          <div>
+            <h2>최소 스택</h2>
+            <p>지금 시작한다면 이 정도가 가장 균형이 좋다.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-8">
+            <h3>Recommended minimum stack</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Concern</th>
+                  <th>Recommendation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>App shell</td>
+                  <td>Tauri + local React UI</td>
+                </tr>
+                <tr>
+                  <td>Operational data</td>
+                  <td>SQLite or PGlite</td>
+                </tr>
+                <tr>
+                  <td>Knowledge documents</td>
+                  <td>Obsidian vault — 마크다운, PDF, 첨부파일, 링크, 태그, 검색 포함</td>
+                </tr>
+                <tr>
+                  <td>Memory layer</td>
+                  <td>mem0 with its own store</td>
+                </tr>
+                <tr>
+                  <td>Search</td>
+                  <td>Start with lexical/file index, add vector later only if needed</td>
+                </tr>
+                <tr>
+                  <td>Background work</td>
+                  <td>single local job runner + cron-style scheduler</td>
+                </tr>
+                <tr>
+                  <td>Backup</td>
+                  <td>DB snapshots + Git for docs + encrypted archive for artifacts</td>
+                </tr>
+              </tbody>
+            </table>
+          </article>
+          <article class="card span-4">
+            <h3>한 줄 결론</h3>
+            <p class="lead">
+              당신에게 맞는 인프라는 `작은 로컬 운영체제`에 가깝다.
+              즉, 서버 팜이 아니라 `한 대의 노트북 위에서 안정적으로 실행되고 복구되는 control plane`을 먼저 만드는 게 맞다.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="s9">
+        <div class="section-head">
+          <span class="section-no">9</span>
+          <div>
+            <h2>Raspberry Pi 활용 아이디어</h2>
+            <p>항상 켜져 있어야 하는 역할을 MacBook 대신 Pi에 위임한다.</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="card span-12">
+            <p class="lead">
+              이 아키텍처에서 Pi가 자연스럽게 들어갈 수 있는 자리는 <strong>항상 켜져 있어야 하는 것들</strong>이다.
+              MacBook은 닫히거나 자지만 Pi는 계속 돌아가기 때문에, Sync/Backup 레이어와 백그라운드 서비스를 분리하기에 적합하다.
+            </p>
+          </article>
+          <article class="card span-6">
+            <h3>🟢 확정: mem0 LLM 추론 서버</h3>
+            <div class="principles">
+              <div class="item">
+                <strong>Ollama 상시 서빙</strong>
+                <span>Pi 5에서 Ollama를 항상 띄워둠. Mac이 꺼져 있어도 기억 추출 대기 가능.</span>
+              </div>
+              <div class="item">
+                <strong>gemma2:2b — 기억 추출</strong>
+                <span>대화 종료 후 "기억할 내용" 추출용. Pi 5에서 ~15-20 tok/s. 비동기라 체감 없음.</span>
+              </div>
+              <div class="item">
+                <strong>nomic-embed-text — 임베딩</strong>
+                <span>기억 저장·검색 시 벡터화. 경량 모델로 Pi에서도 빠름.</span>
+              </div>
+              <div class="item">
+                <strong>API 비용 0</strong>
+                <span>Gemini API 대신 로컬 추론 → mem0 관련 LLM 호출 비용 없음.</span>
+              </div>
+            </div>
+          </article>
+          <article class="card span-6">
+            <h3>🟢 확정: 인프라 역할 분담</h3>
+            <div class="principles">
+              <div class="item">
+                <strong>Pi 5 — Ollama 추론</strong>
+                <span><code>http://raspberrypi.local:11434</code> — LAN으로 Mac에서 접근. 네트워크 레이턴시 ~2ms.</span>
+              </div>
+              <div class="item">
+                <strong>Mac — Qdrant (Docker)</strong>
+                <span>벡터 저장소는 Mac에서 실행. 데이터는 <code>~/workspace/data/mem0/</code>에 영구 보존.</span>
+              </div>
+              <div class="item">
+                <strong>mem0ai (npm) — 어댑터</strong>
+                <span>Personal OS 앱에서 Qdrant + Ollama를 연결. 대화 후 비동기로 기억 추출·저장·조회.</span>
+              </div>
+              <div class="item">
+                <strong>오프라인 fallback</strong>
+                <span>Pi 미연결 시 mem0 기억 추출 skip, 기존 기억 조회는 Mac Qdrant로 가능.</span>
+              </div>
+            </div>
+          </article>
+          <article class="card span-4">
+            <h3>Job Runner · 백그라운드 서비스</h3>
+            <div class="principles">
+              <div class="item">
+                <strong>주기적 DB 스냅샷 백업</strong>
+                <span>cron으로 PGlite 스냅샷을 Pi에 저장. 앱이 꺼져 있어도 백업 동작.</span>
+              </div>
+              <div class="item">
+                <strong>Knowledge System Git sync</strong>
+                <span>knowledge 폴더를 Pi에서 주기적으로 pull/push.</span>
+              </div>
+              <div class="item">
+                <strong>Session log ingestion · 요약</strong>
+                <span>JSONL 로그를 Pi에서 수집하고 주기적으로 요약 생성.</span>
+              </div>
+            </div>
+          </article>
+          <article class="card span-4">
+            <h3>MCP 서버로 Claude Code 연결</h3>
+            <div class="principles">
+              <div class="item">
+                <strong>로컬 네트워크 MCP 서버</strong>
+                <span>Pi를 MCP 서버로 띄우면 MacBook Claude Code 세션에서 Pi 데이터에 직접 접근 가능.</span>
+              </div>
+              <div class="item">
+                <strong>Context Snapshot 관리</strong>
+                <span>"오늘 context snapshot 가져와", "이 결정과 관련된 ADR 검색해줘" 같은 요청을 Pi가 처리.</span>
+              </div>
+              <div class="item">
+                <strong>세션 시작/종료 자동화</strong>
+                <span>session_started · session_closed 이벤트를 Pi 쪽에서 처리하고 관련 데이터 라우팅.</span>
+              </div>
+            </div>
+          </article>
+          <article class="card span-4">
+            <h3>항상 켜진 Knowledge 서버</h3>
+            <div class="principles">
+              <div class="item">
+                <strong>LLM wiki index 서빙</strong>
+                <span>Knowledge System의 문서 인덱스를 항상 쿼리 가능한 상태로 유지.</span>
+              </div>
+              <div class="item">
+                <strong>rebuild-index 스케줄</strong>
+                <span>knowledge/projects/ 변경 감지 → knowledge_index 자동 갱신.</span>
+              </div>
+            </div>
+          </article>
+          <article class="card span-12">
+            <h3>트레이드오프</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>항목</th>
+                  <th>내용</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>전제 조건</td>
+                  <td>Pi와 Mac이 같은 로컬 네트워크에 있을 때 기본 동작. 외부 접근은 Tailscale VPN 필요.</td>
+                </tr>
+                <tr>
+                  <td>권장 시작점</td>
+                  <td>Pi에 Ollama + 모델 설치 → Mac에 Qdrant Docker 실행 → mem0ai 연동. 이후 cron 백업 추가.</td>
+                </tr>
+                <tr>
+                  <td>나중에 붙일 것</td>
+                  <td>MCP 서버, session log ingestion은 데이터가 어느 정도 쌓인 후 의미가 생긴다.</td>
+                </tr>
+              </tbody>
+            </table>
+          </article>
+        </div>
+      </section>
+
+      <div class="footer-link">
+        <a class="inline-link" href="./main-workspace-control-plane.html">Return to Main Workspace Blueprint</a>
+        ·
+        <a class="inline-link" href="./workspace-interaction-pipeline.html">Return to Interaction Pipeline</a>
+      </div>
+    </div>
+  </body>
+</html>
