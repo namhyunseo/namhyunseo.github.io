@@ -15,13 +15,6 @@ layout: default
     {{ content }}
   </div>
 
-  {%- if page.doc %}
-  <div class="doc-embed">
-    <a href="/docs/{{ page.doc }}.html" target="_blank" class="doc-embed__link">↗ 전체 문서 열기</a>
-    <iframe src="/docs/{{ page.doc }}.html" class="doc-embed__frame" loading="lazy" title="{{ page.title }}"></iframe>
-  </div>
-  {%- endif %}
-
   <footer class="entry__foot">
     <a href="/deep-dive/">&larr; Deep Dive 목록</a>
   </footer>

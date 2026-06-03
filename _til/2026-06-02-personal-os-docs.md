@@ -1,13 +1,8 @@
 ---
-layout: post
-title: "20260602"
-categories: TIL
-tags:
+title: "Personal OS 문서 구조 정리"
+date: 2026-06-02
+tags: [personal-os, workspace, architecture]
 ---
-
-
-
-# Personal OS 문서
 
 ## personal-os/docs/
 
@@ -17,97 +12,43 @@ Personal OS 워크스페이스 설계와 인프라, 에이전트 상호작용 �
 
 ## 1. workspace-folder-structure.html
 
-경로  
-personal-os/docs/workspace-folder-structure.html
+`~/workspace/` 폴더 구조 설계 문서.
 
-내용  
-~/workspace/ 폴더 구조 설계 문서.
-
-주요 내용
 - raw/ 폴더의 역할
 - knowledge/ 폴더의 역할
 - data/ 폴더의 역할
 - 각 폴더 간 경계 규칙
 - 어떤 정보가 어디에 저장되어야 하는지에 대한 기준
 
----
-
 ## 2. workspace-infrastructure.html
 
-경로  
-personal-os/docs/workspace-infrastructure.html
-
-내용  
 Personal OS 전체 인프라 청사진 문서.
 
-주요 내용
-- Personal OS 앱
-- Knowledge System
-- mem0
-- Raspberry Pi
-- Pi + Qdrant 구성
+- Personal OS 앱 / Knowledge System / mem0 / Raspberry Pi / Pi + Qdrant 구성
 - 각 레이어별 역할 분담
 - 앱, 지식 시스템, 메모리 시스템, 로컬 서버 간 연결 구조
 
----
-
 ## 3. workspace-interaction-pipeline.html
 
-경로  
-personal-os/docs/workspace-interaction-pipeline.html
-
-내용  
 에이전트와의 상호작용 흐름을 정리한 문서.
 
-주요 내용
 - 사용자 입력 분류
 - 입력 유형별 실행 흐름
-- 실행 결과 라우팅 기준
 - 결과를 task, knowledge, memory 중 어디로 보낼지 판단하는 파이프라인
-- 에이전트가 정보를 처리하고 저장하는 기준
-
----
 
 ## 4. main-workspace-control-plane.html
 
-경로  
-personal-os/docs/main-workspace-control-plane.html
-
-내용  
-워크스페이스 전체 컨트롤 플레인 개요 문서.
-
-주요 내용
-- 전체 문서의 상위 인덱스
-- workspace-folder-structure.html
-- workspace-infrastructure.html
-- workspace-interaction-pipeline.html
-- 위 3개 문서를 연결하는 상위 설계도
-- Personal OS 워크스페이스의 중심 구조
-
----
+워크스페이스 전체 컨트롤 플레인 개요 문서. 위 3개 문서를 연결하는 상위 설계도.
 
 ## 5. tauri-migration-concepts.html
 
-경로  
-personal-os/docs/tauri-migration-concepts.html
-
-내용  
 Next.js 기반 Personal OS 앱을 Tauri 데스크탑 앱으로 전환하기 위한 개념 정리 문서.
 
-주요 내용
-- Next.js → Tauri 전환 개념
-- PGlite 도입 전략
-- Dual-mode 아키텍처
-- 정적 빌드 전략
-- 웹 앱과 데스크탑 앱을 함께 고려한 구조 설계
+- Next.js → Tauri 전환 개념 / PGlite 도입 전략 / Dual-mode 아키텍처 / 정적 빌드 전략
 
 ---
 
-### 문서 관계 요약
-
-text main-workspace-control-plane.html ├── workspace-folder-structure.html ├── workspace-infrastructure.html ├── workspace-interaction-pipeline.html └── tauri-migration-concepts.html 
-
-## 역할 구분
+### 역할 구분
 
 | 문서 | 역할 |
 |---|---|

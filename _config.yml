@@ -19,9 +19,16 @@ author:
 minima:
   header_pages:
     - index.md
+    - deep-dive/index.html
+    - til/index.html
     - about.md
   social_links:
     - { platform: github, user: namhyunseo }
+
+collections:
+  til:
+    output: true
+    permalink: /til/:name/
 
 defaults:
   - scope:
@@ -29,3 +36,8 @@ defaults:
       type: "posts"
     values:
       layout: post
+  - scope:
+      path: ""
+      type: "til"
+    values:
+      layout: til

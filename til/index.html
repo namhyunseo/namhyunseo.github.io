@@ -1,0 +1,25 @@
+---
+layout: default
+title: TIL
+permalink: /til/
+---
+
+<div class="archive">
+  <header class="page-head">
+    <h1 class="page-head__title">TIL</h1>
+    <p class="page-head__desc">매일 배운 것을 짧게 기록합니다. 여기에 쌓인 기록이 <a href="/deep-dive/">Deep Dive</a>의 재료가 됩니다.</p>
+  </header>
+
+  <ol class="index">
+    {%- assign tils = site.til | sort: "date" | reverse -%}
+    {%- for til in tils -%}
+    <li class="index__row">
+      <a href="{{ til.url | relative_url }}">
+        <span class="index__num">{% if forloop.index < 10 %}0{% endif %}{{ forloop.index }}</span>
+        <span class="index__title">{{ til.title | escape }}</span>
+        <time class="index__date">{{ til.date | date: "%Y.%m.%d" }}</time>
+      </a>
+    </li>
+    {%- endfor -%}
+  </ol>
+</div>

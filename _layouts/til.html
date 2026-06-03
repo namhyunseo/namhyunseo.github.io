@@ -2,7 +2,7 @@
 layout: default
 ---
 <article class="entry">
-  <p class="page-head__kicker">Deep Dive</p>
+  <p class="page-head__kicker">TIL</p>
   <h1 class="entry__heading">{{ page.title | escape }}</h1>
   <p class="entry__meta">
     <time>{{ page.date | date: "%Y.%m.%d" }}</time>
@@ -15,14 +15,7 @@ layout: default
     {{ content }}
   </div>
 
-  {%- if page.doc %}
-  <div class="doc-embed">
-    <a href="/docs/{{ page.doc }}.html" target="_blank" class="doc-embed__link">↗ 전체 문서 열기</a>
-    <iframe src="/docs/{{ page.doc }}.html" class="doc-embed__frame" loading="lazy" title="{{ page.title }}"></iframe>
-  </div>
-  {%- endif %}
-
   <footer class="entry__foot">
-    <a href="/deep-dive/">&larr; Deep Dive 목록</a>
+    <a href="/til/">&larr; TIL 목록</a>
   </footer>
 </article>

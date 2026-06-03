@@ -3,6 +3,7 @@ layout: home
 title: 홈
 ---
 
-<section class="home-intro">
-  <h1 class="home-intro__title">기록하면서 배우는 개발 블로그입니다.</h1>
-</section>
+<header class="lede">
+  <h1 class="lede__title">기록하며<br>배우는 개발</h1>
+  <p class="lede__sub">만든 것, 배운 것, 그리고 그렇게 결정한 이유를 남깁니다.</p>
+</header>

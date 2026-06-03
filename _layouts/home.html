@@ -1,0 +1,54 @@
+---
+layout: default
+---
+<div class="home">
+  {{ content }}
+
+  <section class="section section--primary">
+    <div class="section__bar">
+      <span class="section__name">Deep Dive</span>
+      <span class="section__note">기술적 고민과 결정의 근거 · {{ site.posts | size }}</span>
+    </div>
+    <ol class="index">
+      {%- assign posts = site.posts | slice: 0, 6 -%}
+      {%- if posts.size > 0 -%}
+      {%- for post in posts -%}
+      <li class="index__row">
+        <a href="{{ post.url | relative_url }}">
+          <span class="index__num">{% if forloop.index < 10 %}0{% endif %}{{ forloop.index }}</span>
+          <span class="index__title">{{ post.title | escape }}</span>
+          <time class="index__date">{{ post.date | date: "%Y.%m.%d" }}</time>
+        </a>
+      </li>
+      {%- endfor -%}
+      {%- else -%}
+      <li class="index__empty">아직 글이 없어요.</li>
+      {%- endif -%}
+    </ol>
+    <a class="section__more" href="/deep-dive/">Deep Dive 전체</a>
+  </section>
+
+  <section class="section section--secondary">
+    <div class="section__bar">
+      <span class="section__name">TIL</span>
+      <span class="section__note">매일의 짧은 기록 · {{ site.til | size }}</span>
+    </div>
+    <ol class="index">
+      {%- assign tils = site.til | sort: "date" | reverse | slice: 0, 6 -%}
+      {%- if tils.size > 0 -%}
+      {%- for til in tils -%}
+      <li class="index__row">
+        <a href="{{ til.url | relative_url }}">
+          <span class="index__num">{% if forloop.index < 10 %}0{% endif %}{{ forloop.index }}</span>
+          <span class="index__title">{{ til.title | escape }}</span>
+          <time class="index__date">{{ til.date | date: "%Y.%m.%d" }}</time>
+        </a>
+      </li>
+      {%- endfor -%}
+      {%- else -%}
+      <li class="index__empty">아직 기록이 없어요.</li>
+      {%- endif -%}
+    </ol>
+    <a class="section__more" href="/til/">TIL 전체</a>
+  </section>
+</div>
