@@ -40,9 +40,10 @@ bundle exec jekyll build
 ### 새 글 만들기 — QuickAdd (Obsidian)
 
 명령 팔레트에서 한 번에 날짜 파일명 + 양식이 채워진 새 글을 만듭니다.
+**제목(한글)**과 **슬러그(영문 파일명)** 를 차례로 입력 → 깔끔한 영문 URL.
 
-- **`New Deep Dive`** → 제목 입력 → `_posts/YYYY-MM-DD-제목.md` 생성 (layout/date/categories/tags 자동)
-- **`New TIL`** → 제목 입력 → `_til/YYYY-MM-DD-제목.md` 생성 (date/tags 자동)
+- **`New Deep Dive`** → 제목 + 슬러그 → `_posts/YYYY-MM-DD-<slug>.md` 생성 (layout/date/categories/tags 자동)
+- **`New TIL`** → 제목 + 슬러그 → `_til/YYYY-MM-DD-<slug>.md` 생성 (date/tags 자동)
 
 설정: QuickAdd 플러그인 설치 → `.obsidian/plugins/quickadd/data.json`에 두 명령이 미리 구성돼 있음.
 템플릿 원본은 `_templates/deep-dive.md`, `_templates/til.md` (Jekyll 빌드에서 제외되는 `_` 폴더).
@@ -56,7 +57,7 @@ cp _templates/til.md       _til/2026-06-03-my-til.md           # TIL
 ```
 
 - Deep Dive 목록: `/deep-dive/` · TIL 목록: `/til/` (URL은 `/til/<파일명>/`)
-- 한글 제목은 파일명에 그대로 써도 되지만 URL이 인코딩됩니다. 깔끔한 URL을 원하면 파일명만 영문 슬러그로.
+- 태그는 `/tags/`에서 주제별로 모아 봅니다. 글 본문 이미지는 `_posts`가 아니라 `assets/`에 두세요(미게시 방지).
 
 ## Project Structure
 

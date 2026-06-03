@@ -5,3 +5,6 @@ _site/
 vendor/
 bundle/
 .DS_Store
+
+# 로컬 스크린샷/잡파일
+스크린샷*.png

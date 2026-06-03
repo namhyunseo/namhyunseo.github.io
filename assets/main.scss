@@ -18,7 +18,7 @@ $serif: "Pretendard", "Pretendard Variable", -apple-system, BlinkMacSystemFont, 
 $sans:  "Pretendard", "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", Roboto, sans-serif;
 $ink:   #1a1a1a;
 $soft:  #565656;
-$faint: #9b9b96;
+$faint: #6f6f6f;   // WCAG AA(≈4.8:1) 충족하도록 진하게
 $rule:  #e7e6e2;
 $paper: #ffffff;
 
@@ -30,6 +30,15 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 a { color: $ink; text-decoration: none; }
+
+/* 본문 안 링크는 밑줄로 명확히 구분 (독자 가독성) */
+.post-content a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  text-decoration-color: $faint;
+  &:hover { text-decoration-color: $ink; }
+}
 
 .page-content { padding-top: 2.75rem; }
 
@@ -258,7 +267,38 @@ a { color: $ink; text-decoration: none; }
   font-size: 0.78rem;
   color: $soft;
   &::before { content: "#"; color: $faint; }
+  &:hover { color: $ink; }
 }
+
+/* 태그 페이지 */
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.9rem;
+  margin-bottom: 2.75rem;
+}
+.tag-cloud__item {
+  font-size: 0.9rem;
+  color: $soft;
+  &:hover { color: $ink; }
+}
+.tag-group {
+  margin-bottom: 2.75rem;
+  scroll-margin-top: 2rem;
+}
+.tag-group__name {
+  margin: 0 0 0.4rem;
+  padding-bottom: 0.5rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  border-bottom: 1px solid $rule;
+}
+.tag-group__count {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: $faint;
+}
+.index--plain .index__row a { grid-template-columns: 1fr auto; }
 .entry__foot {
   margin-top: 3.25rem;
   padding-top: 1.5rem;
@@ -269,6 +309,35 @@ a { color: $ink; text-decoration: none; }
     color: $soft;
     &:hover { color: $ink; }
   }
+}
+
+/* 이전/다음 글 내비 */
+.post-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid $rule;
+}
+.post-nav__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.post-nav__item--next { text-align: right; }
+.post-nav__item--next:only-child { grid-column: 2; }
+.post-nav__label { font-size: 0.78rem; color: $faint; }
+.post-nav__title { font-weight: 600; line-height: 1.4; color: $ink; }
+.post-nav__item:hover .post-nav__title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+@media (max-width: 560px) {
+  .post-nav { grid-template-columns: 1fr; gap: 1rem; }
+  .post-nav__item--next { text-align: left; }
+  .post-nav__item--next:only-child { grid-column: 1; }
 }
 
 /* 문서 임베드 (doc-post) */
@@ -288,6 +357,46 @@ a { color: $ink; text-decoration: none; }
   height: 80vh;
   border: 1px solid $rule;
   border-radius: 6px;
+}
+/* 모바일에선 무거운 iframe 대신 '문서 열기' 링크만 노출 */
+@media (max-width: 600px) {
+  .doc-embed__frame { display: none; }
+  .doc-embed__link {
+    font-weight: 600;
+    color: $ink;
+  }
+}
+
+/* 404 */
+.notfound {
+  text-align: center;
+  padding: 4rem 0 5rem;
+}
+.notfound__code {
+  margin: 0;
+  font-size: clamp(4rem, 14vw, 7rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: $ink;
+  line-height: 1;
+}
+.notfound__title {
+  margin: 0.6rem 0 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.notfound__desc { margin: 0 0 2rem; color: $faint; }
+.notfound__links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+.notfound__links a {
+  color: $soft;
+  border-bottom: 1px solid $rule;
+  padding-bottom: 2px;
+  &:hover { color: $ink; border-color: $ink; }
 }
 
 /* 반응형 */

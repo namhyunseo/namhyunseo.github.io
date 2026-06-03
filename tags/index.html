@@ -1,0 +1,48 @@
+---
+layout: default
+title: 태그
+permalink: /tags/
+---
+
+{%- assign all = site.posts | concat: site.til -%}
+{%- assign tagsStr = "" -%}
+{%- for item in all -%}
+  {%- for t in item.tags -%}
+    {%- assign tagsStr = tagsStr | append: t | append: "," -%}
+  {%- endfor -%}
+{%- endfor -%}
+{%- assign tagList = tagsStr | split: "," | uniq | sort -%}
+
+<div class="archive">
+  <header class="page-head">
+    <h1 class="page-head__title">태그</h1>
+    <p class="page-head__desc">주제별로 글을 모아 봅니다.</p>
+  </header>
+
+  {%- if tagList.size > 0 %}
+  <nav class="tag-cloud">
+    {%- for tag in tagList -%}
+    <a class="tag-cloud__item" href="#tag-{{ tag | slugify }}">#{{ tag }}</a>
+    {%- endfor -%}
+  </nav>
+
+  {%- for tag in tagList -%}
+  {%- assign tagged = all | where_exp: "i", "i.tags contains tag" | sort: "date" | reverse -%}
+  <section class="tag-group" id="tag-{{ tag | slugify }}">
+    <h2 class="tag-group__name">#{{ tag }} <span class="tag-group__count">{{ tagged.size }}</span></h2>
+    <ul class="index index--plain">
+      {%- for item in tagged -%}
+      <li class="index__row">
+        <a href="{{ item.url | relative_url }}">
+          <span class="index__title">{{ item.title | escape }}</span>
+          <time class="index__date">{{ item.date | date: "%Y.%m.%d" }}</time>
+        </a>
+      </li>
+      {%- endfor -%}
+    </ul>
+  </section>
+  {%- endfor -%}
+  {%- else %}
+  <p class="til-intro">아직 태그가 없어요.</p>
+  {%- endif %}
+</div>

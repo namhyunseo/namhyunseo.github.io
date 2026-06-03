@@ -7,7 +7,7 @@ layout: default
   <p class="entry__meta">
     <time>{{ page.date | date: "%Y.%m.%d" }}</time>
     {%- if page.tags and page.tags.size > 0 %}
-    {% for tag in page.tags %}<span class="tag">{{ tag }}</span>{% endfor %}
+    {% for tag in page.tags %}<a class="tag" href="/tags/#tag-{{ tag | slugify }}">{{ tag }}</a>{% endfor %}
     {%- endif %}
   </p>
 

@@ -14,7 +14,6 @@ plugins:
 
 author:
   name: Nam Hyunseo
-  email: namhyunseo0224@gmail.com
 
 minima:
   header_pages:
@@ -31,6 +30,10 @@ collections:
     permalink: /til/:name/
 
 defaults:
+  - scope:
+      path: ""
+    values:
+      image: /assets/og-default.png
   - scope:
       path: ""
       type: "posts"

@@ -7,13 +7,33 @@ layout: default
   <p class="entry__meta">
     <time>{{ page.date | date: "%Y.%m.%d" }}</time>
     {%- if page.tags and page.tags.size > 0 %}
-    {% for tag in page.tags %}<span class="tag">{{ tag }}</span>{% endfor %}
+    {% for tag in page.tags %}<a class="tag" href="/tags/#tag-{{ tag | slugify }}">{{ tag }}</a>{% endfor %}
     {%- endif %}
   </p>
 
   <div class="post-content">
     {{ content }}
   </div>
+
+  {%- comment -%} Jekyll: page.previous = 더 오래된 글, page.next = 더 최신 글 {%- endcomment -%}
+  {%- assign older = page.previous -%}
+  {%- assign newer = page.next -%}
+  {%- if older or newer %}
+  <nav class="post-nav">
+    {%- if older %}
+    <a class="post-nav__item post-nav__item--prev" href="{{ older.url | relative_url }}">
+      <span class="post-nav__label">이전 글</span>
+      <span class="post-nav__title">{{ older.title | escape }}</span>
+    </a>
+    {%- endif %}
+    {%- if newer %}
+    <a class="post-nav__item post-nav__item--next" href="{{ newer.url | relative_url }}">
+      <span class="post-nav__label">다음 글</span>
+      <span class="post-nav__title">{{ newer.title | escape }}</span>
+    </a>
+    {%- endif %}
+  </nav>
+  {%- endif %}
 
   <footer class="entry__foot">
     <a href="/deep-dive/">&larr; Deep Dive 목록</a>

@@ -7,13 +7,37 @@ layout: default
   <p class="entry__meta">
     <time>{{ page.date | date: "%Y.%m.%d" }}</time>
     {%- if page.tags and page.tags.size > 0 %}
-    {% for tag in page.tags %}<span class="tag">{{ tag }}</span>{% endfor %}
+    {% for tag in page.tags %}<a class="tag" href="/tags/#tag-{{ tag | slugify }}">{{ tag }}</a>{% endfor %}
     {%- endif %}
   </p>
 
   <div class="post-content">
     {{ content }}
   </div>
+
+  {%- assign tils = site.til | sort: "date" -%}
+  {%- assign cur = 0 -%}
+  {%- for t in tils -%}{%- if t.url == page.url -%}{%- assign cur = forloop.index0 -%}{%- endif -%}{%- endfor -%}
+  {%- assign previdx = cur | minus: 1 -%}
+  {%- assign nextidx = cur | plus: 1 -%}
+  {%- assign older = tils[previdx] -%}
+  {%- assign newer = tils[nextidx] -%}
+  {%- if older or newer %}
+  <nav class="post-nav">
+    {%- if older and previdx >= 0 %}
+    <a class="post-nav__item post-nav__item--prev" href="{{ older.url | relative_url }}">
+      <span class="post-nav__label">이전 글</span>
+      <span class="post-nav__title">{{ older.title | escape }}</span>
+    </a>
+    {%- endif %}
+    {%- if newer %}
+    <a class="post-nav__item post-nav__item--next" href="{{ newer.url | relative_url }}">
+      <span class="post-nav__label">다음 글</span>
+      <span class="post-nav__title">{{ newer.title | escape }}</span>
+    </a>
+    {%- endif %}
+  </nav>
+  {%- endif %}
 
   <footer class="entry__foot">
     <a href="/til/">&larr; TIL 목록</a>
