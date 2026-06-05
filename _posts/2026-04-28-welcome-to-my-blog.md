@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "Welcome to My Blog!"
-date:   2026-04-28 12:00:00 +0900
+title: Welcome to My Blog!
+date: 2026-04-28 12:00:00 +0900
 categories: general
 ---
 
