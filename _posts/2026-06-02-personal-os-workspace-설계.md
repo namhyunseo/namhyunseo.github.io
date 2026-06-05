@@ -13,7 +13,7 @@ doc: workspace-infrastructure
 
 ### Output
 1. personal OS 데스크탑 앱으로 개발 -> 실제 사용 시작
-![[스크린샷 2026-06-02 오후 9.15.36.png]]
+![personal OS 데스크탑 앱 화면](/assets/img/2026-06-02-personal-os.png)
 
 2. Personal OS 프로젝트의 전체 인프라 설계를 정리한 문서.
 
