@@ -6,5 +6,5 @@ vendor/
 bundle/
 .DS_Store
 
-# 로컬 스크린샷/잡파일
-스크린샷*.png
+# 로컬 스크린샷 잡파일 (루트에 떨어지는 것만 무시, assets/img는 추적)
+/스크린샷*.png
