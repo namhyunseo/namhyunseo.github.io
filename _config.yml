@@ -25,6 +25,10 @@ minima:
   social_links:
     - { platform: github, user: namhyunseo }
 
+# 방문자 분석 (GoatCounter). 가입 후 받은 코드명 넣고 아래 줄 주석 해제하면 켜짐.
+# 예: 대시보드가 https://namuteo.goatcounter.com 이면 → goatcounter_code: namuteo
+goatcounter_code: namuteo
+
 collections:
   til:
     output: true
