@@ -20,6 +20,7 @@ minima:
     - index.md
     - deep-dive/index.html
     - til/index.html
+    - honnamanmu/index.html
     - about.md
   social_links:
     - { platform: github, user: namhyunseo }

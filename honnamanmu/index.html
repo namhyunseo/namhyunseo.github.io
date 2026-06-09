@@ -1,0 +1,25 @@
+---
+layout: default
+title: 혼나만무
+permalink: /honnamanmu/
+---
+
+<div class="archive">
+  <header class="page-head">
+    <h1 class="page-head__title">혼나만무</h1>
+    <p class="page-head__desc">혼나만무 스터디 기록. 주차별·아티클별로 배운 것을 쌓고, 깊어진 주제는 <a href="/deep-dive/">Deep Dive</a>로 발행합니다.</p>
+  </header>
+
+  {%- assign items = site.posts | concat: site.til | where_exp: "i", "i.tags contains 'honnamanmu'" | sort: "date" | reverse -%}
+  <ol class="index">
+    {%- for item in items -%}
+    <li class="index__row">
+      <a href="{{ item.url | relative_url }}">
+        <span class="index__num">{% if forloop.index < 10 %}0{% endif %}{{ forloop.index }}</span>
+        <span class="index__title">{{ item.title | escape }}</span>
+        <time class="index__date">{{ item.date | date: "%Y.%m.%d" }}</time>
+      </a>
+    </li>
+    {%- endfor -%}
+  </ol>
+</div>
