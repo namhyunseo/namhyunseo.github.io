@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "_til/2026-06-10-6월10일.md",
+                "file": "_til/2026-06-11-6월 11일.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "2026-06-10-6월10일"
+              "title": "2026-06-11-6월 11일"
             }
           }
         ]
@@ -196,8 +196,9 @@
   },
   "active": "5500c0eb268d0599",
   "lastOpenFiles": [
-    "_til/2026-06-09-6월9일.md",
     "_til/2026-06-10-6월10일.md",
+    "_til/2026-06-11-6월 11일.md",
+    "_til/2026-06-09-6월9일.md",
     "_til/2026-06-09-혼나만무-week1.md",
     "_site/scripts/install-hooks.sh",
     "_site/scripts/fix-image-paths.sh",
