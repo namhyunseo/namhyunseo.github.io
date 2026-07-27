@@ -1,0 +1,71 @@
+backend:
+  name: github
+  repo: namhyunseo/namhyunseo.github.io
+  branch: main
+
+# 업로드한 이미지가 저장되는 위치 / 본문에 삽입될 경로
+media_folder: assets/img
+public_folder: /assets/img
+
+# 관리자 UI 언어
+locale: ko
+
+collections:
+  # ── Deep Dive (기술 글) → _posts ─────────────────────────────
+  - name: deep-dive
+    label: Deep Dive
+    label_singular: Deep Dive 글
+    folder: _posts
+    create: true
+    # 파일명: YYYY-MM-DD-<영문슬러그>.md
+    slug: "{{year}}-{{month}}-{{day}}-{{fields.slug}}"
+    summary: "{{title}}"
+    sortable_fields: [date, title]
+    fields:
+      - { name: layout, label: Layout, widget: hidden, default: post }
+      - { name: title, label: 제목, widget: string }
+      - {
+          name: slug,
+          label: 슬러그 (영문 URL),
+          widget: string,
+          hint: "파일명·URL에 쓰입니다. 영문 소문자·하이픈. 예: my-first-post",
+        }
+      - {
+          name: date,
+          label: 날짜,
+          widget: datetime,
+          date_format: "YYYY-MM-DD",
+          time_format: false,
+          format: "YYYY-MM-DD",
+        }
+      - { name: categories, label: 카테고리, widget: list, default: ["dev"] }
+      - { name: tags, label: 태그, widget: list, default: [], required: false }
+      - { name: body, label: 본문, widget: markdown }
+
+  # ── TIL → _til ───────────────────────────────────────────────
+  - name: til
+    label: TIL
+    label_singular: TIL
+    folder: _til
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{fields.slug}}"
+    summary: "{{title}}"
+    sortable_fields: [date, title]
+    fields:
+      - { name: title, label: 제목, widget: string }
+      - {
+          name: slug,
+          label: 슬러그 (영문 파일명),
+          widget: string,
+          hint: "파일명·URL에 쓰입니다. 영문 소문자·하이픈. 예: react-hooks",
+        }
+      - {
+          name: date,
+          label: 날짜,
+          widget: datetime,
+          date_format: "YYYY-MM-DD",
+          time_format: false,
+          format: "YYYY-MM-DD",
+        }
+      - { name: tags, label: 태그, widget: list, default: [], required: false }
+      - { name: body, label: 본문, widget: markdown }
