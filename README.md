@@ -9,3 +9,8 @@
   - 이미지는 `posts/assets/` (옵시디언 설정에 맞춰 둠), 마크다운 링크 `![](assets/x.png)`.
 - **로컬:** Node 22.23.4 이상 필요(Astro 7). `npm run dev` → http://localhost:4321
 - **빌드:** `npm run build` → `dist/`
+- **자동 올리기 (Obsidian Git):** `posts/.obsidian/plugins/obsidian-git` 설치 · 설정해 둠.
+  - 마지막 수정 5분 뒤 자동 commit + push → GitHub Actions 배포. 볼트 열 때 자동 pull.
+  - `limitToVault` 켜 둠 — `posts/` 안 파일만 커밋.
+  - 쓰는 중인 글은 `draft: true` 로 (템플릿 기본값). 올릴 때 지우거나 `false`.
+  - 바로 올리기: 명령 팔레트(Cmd+P) → 「Git: Commit-and-sync」.

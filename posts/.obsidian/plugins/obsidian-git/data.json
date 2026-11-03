@@ -1,0 +1,15 @@
+{
+  "commitMessage": "post: {{date}}",
+  "autoCommitMessage": "post: {{date}}",
+  "autoSaveInterval": 5,
+  "autoBackupAfterFileChange": true,
+  "autoPushInterval": 0,
+  "autoPullInterval": 0,
+  "autoPullOnBoot": true,
+  "pullBeforePush": true,
+  "disablePush": false,
+  "syncMethod": "merge",
+  "limitToVault": true,
+  "disablePopupsForNoChanges": true,
+  "showStatusBar": true
+}
