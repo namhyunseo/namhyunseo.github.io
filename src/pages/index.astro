@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import { getPosts, formatDate } from '../lib';
+
+const posts = await getPosts();
+---
+<Base>
+  <a class="site" href="/">HSBlog</a>
+  <ul class="list">
+    {posts.map((p) => (
+      <li>
+        <a href={`/${p.id}/`}>
+          <span class="t">{p.data.title}</span>
+          <span class="d">{formatDate(p.data.date)}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</Base>

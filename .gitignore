@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+posts/.obsidian/workspace*.json
+posts/.obsidian/cache
+posts/.trash/
